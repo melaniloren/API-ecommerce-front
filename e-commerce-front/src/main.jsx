@@ -10,14 +10,30 @@ import Card from './ejemplos/Card.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {/* <OnOff /> */}
-    {/* <ProductCard /> */}
-    {/* <TwitterCard userName='jperez' initialIsFollowing={false} >
+
+    {/*
+     <OnOff />
+    <ProductCard />
+    
+     <TwitterCard userName='jperez' initialIsFollowing={false} >
       @ssanchez
-    </TwitterCard> */}
+    </TwitterCard> 
+
     <Card userName='jsuarez' onFollow='false' formatUserName={(name) => name.toUpperCase()}>
       <p>Me gustan los deportes</p>
     </Card>
+
+    <OnOff>
+    </OnOff>
+
+    */}
+
+
+    <App>
+      
+    </App>
+
+
     {/* <Card userName='jperez' onFollow='true' formatUserName={(name) => name.toUpperCase()}>
       <p>Me gustan la tecnología</p>
       <div>
