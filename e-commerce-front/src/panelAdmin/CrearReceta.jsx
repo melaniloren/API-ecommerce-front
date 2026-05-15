@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import fetchConAuth from '../utils/fetchConAuth';
 
-const CrearReceta = ({ onRecetaCreada, onCancelar }) => {
+const CrearReceta = ({ onRecetaCreada, onCancelar, recetaEditar }) => {
+
+  const esEdicion = !!recetaEditar;
 
   const [formData, setFormData] = useState({
-    nombre: '',
-    descripcion: '',
-    precio: '',
-    categoriaId: ''
+    nombre: recetaEditar?.nombre ?? '',
+    descripcion: recetaEditar?.descripcion ?? '',
+    precio: recetaEditar?.precio ?? '',
+    categoriaId: recetaEditar?.categorias?.[0]?.idCategoria ?? ''
   });
 
   const [categorias, setCategorias] = useState([]);
@@ -69,10 +71,14 @@ const CrearReceta = ({ onRecetaCreada, onCancelar }) => {
 
       console.log('Payload enviado:', payload);
 
+      const url = esEdicion
+        ? `http://localhost:8080/api/recetas/${recetaEditar.id}`
+        : 'http://localhost:8080/api/recetas';
+
       const response = await fetchConAuth(
-        'http://localhost:8080/api/recetas',
+        url,
         {
-          method: 'POST',
+          method: esEdicion ? 'PUT' : 'POST',
           body: JSON.stringify(payload)
         }
       );
@@ -84,15 +90,15 @@ const CrearReceta = ({ onRecetaCreada, onCancelar }) => {
         console.error(errorText);
 
         throw new Error(
-          'Error al crear receta'
+          esEdicion ? 'Error al actualizar receta' : 'Error al crear receta'
         );
       }
 
       const nuevaReceta = await response.json();
 
-      console.log('Receta creada:', nuevaReceta);
+      console.log(esEdicion ? 'Receta actualizada:' : 'Receta creada:', nuevaReceta);
 
-      alert('Receta creada correctamente');
+      alert(esEdicion ? 'Receta actualizada correctamente' : 'Receta creada correctamente');
 
       setFormData({
         nombre: '',
@@ -130,7 +136,7 @@ const CrearReceta = ({ onRecetaCreada, onCancelar }) => {
     >
 
       <h2 style={{ marginTop: 0 }}>
-        Nueva Receta
+        {esEdicion ? 'Editar Receta' : 'Nueva Receta'}
       </h2>
 
       <form

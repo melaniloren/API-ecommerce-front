@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CrearReceta from './CrearReceta';
+import fetchConAuth from '../utils/fetchConAuth';
 
 const AdminRecetas = () => {
   const [recetas, setRecetas] = useState([]);
@@ -8,6 +9,7 @@ const AdminRecetas = () => {
 
   // Control del popup
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [recetaEditando, setRecetaEditando] = useState(null);
 
   useEffect(() => {
     fetchRecetas();
@@ -38,7 +40,7 @@ const AdminRecetas = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/recetas/${id}`, {
+      const response = await fetchConAuth(`http://localhost:8080/api/recetas/${id}`, {
         method: 'DELETE',
       });
 
@@ -53,6 +55,21 @@ const AdminRecetas = () => {
     } catch (err) {
       alert(err.message);
     }
+  };
+
+  const abrirCrear = () => {
+    setRecetaEditando(null);
+    setMostrarFormulario(true);
+  };
+
+  const abrirEditar = (receta) => {
+    setRecetaEditando(receta);
+    setMostrarFormulario(true);
+  };
+
+  const cerrarFormulario = () => {
+    setMostrarFormulario(false);
+    setRecetaEditando(null);
   };
 
   if (loading) {
@@ -73,7 +90,7 @@ const AdminRecetas = () => {
       <h1>Gestión de Recetas</h1>
 
       <button
-        onClick={() => setMostrarFormulario(true)}
+        onClick={abrirCrear}
         style={{
           marginBottom: '1rem',
           padding: '10px 16px',
@@ -91,7 +108,7 @@ const AdminRecetas = () => {
       {/* MODAL */}
       {mostrarFormulario && (
         <div
-          onClick={() => setMostrarFormulario(false)}
+          onClick={cerrarFormulario}
           style={{
             position: 'fixed',
             top: 0,
@@ -110,11 +127,12 @@ const AdminRecetas = () => {
           {/* Evita que se cierre al hacer click dentro */}
           <div onClick={(e) => e.stopPropagation()}>
             <CrearReceta
+              recetaEditar={recetaEditando}
               onRecetaCreada={() => {
                 fetchRecetas();
-                setMostrarFormulario(false);
+                cerrarFormulario();
               }}
-              onCancelar={() => setMostrarFormulario(false)}
+              onCancelar={cerrarFormulario}
             />
           </div>
         </div>
@@ -186,6 +204,7 @@ const AdminRecetas = () => {
                   }}
                 >
                   <button
+                    onClick={() => abrirEditar(receta)}
                     style={{
                       marginRight: '0.5rem',
                       color: '#007bff',
