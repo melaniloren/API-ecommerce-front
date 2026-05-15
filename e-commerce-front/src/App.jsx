@@ -12,11 +12,11 @@ function App() {
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   const navItems = [
-    { id: 'catalogo', label: '🍽️ Catálogo' },
-    { id: 'login',    label: '🔑 Iniciar Sesión' },
-    { id: 'register', label: '📝 Registrarse' },
-    { id: 'perfil',   label: '👤 Mi Perfil' },
-    { id: 'admin',    label: '⚙️ Admin' },
+    { id: 'catalogo', label: 'Catálogo' },
+    { id: 'login',    label: 'Iniciar Sesión' },
+    { id: 'register', label: 'Registrarse' },
+    { id: 'perfil',   label: 'Mi Perfil' },
+    { id: 'admin',    label: 'Admin' },
   ];
 
   const navegar = (vista) => {

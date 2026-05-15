@@ -45,8 +45,17 @@ const UserRegister = () => {
                 <input
                     type="text"
                     name="nombre"
-                    placeholder="Nombre completo"
+                    placeholder="Nombre"
                     value={formData.nombre}
+                    onChange={handleChange}
+                    required
+                    style={{ padding: '0.5rem' }}
+                />
+                <input
+                    type="text"
+                    name="apellido"
+                    placeholder="Apellido"
+                    value={formData.apellido}
                     onChange={handleChange}
                     required
                     style={{ padding: '0.5rem' }}
