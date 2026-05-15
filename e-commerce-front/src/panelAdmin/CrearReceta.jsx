@@ -203,8 +203,8 @@ const CrearReceta = ({ onRecetaCreada, onCancelar }) => {
             {categorias.map((cat) => (
 
               <option
-                key={cat.id}
-                value={cat.id}
+                key={cat.idCategoria}
+                value={cat.idCategoria}
               >
                 {cat.nombre}
               </option>
