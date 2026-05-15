@@ -4,33 +4,52 @@ import UserLogin from './gestionDeUsuarios/UserLogin';
 import UserRegister from './gestionDeUsuarios/UserRegister';
 import UserProfile from './gestionDeUsuarios/UserProfile';
 import AdminRecetas from './panelAdmin/AdminRecetas';
+import { esAdmin } from './utils/auth';
 import './App.css';
 
 function App() {
-  // Vista activa: 'catalogo' | 'login' | 'register' | 'perfil' | 'admin'
   const [vistaActiva, setVistaActiva] = useState('catalogo');
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [logueado, setLogueado] = useState(!!localStorage.getItem('token'));
+  const [admin, setAdmin] = useState(esAdmin());
 
-  const navItems = [
-    { id: 'catalogo', label: 'Catálogo' },
-    { id: 'login',    label: 'Iniciar Sesión' },
-    { id: 'register', label: 'Registrarse' },
-    { id: 'perfil',   label: 'Mi Perfil' },
-    { id: 'admin',    label: 'Admin' },
-  ];
+  const handleLoginExitoso = () => {
+    setLogueado(true);
+    setAdmin(esAdmin()); // Actualizamos el rol después del login
+    setVistaActiva('catalogo');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setLogueado(false);
+    setAdmin(false);
+    setVistaActiva('catalogo');
+  };
 
   const navegar = (vista) => {
     setVistaActiva(vista);
     setMenuAbierto(false);
   };
 
+  const navItems = [
+    { id: 'catalogo',  label: 'Catálogo',       visible: true },
+    { id: 'login',     label: 'Iniciar Sesión',   visible: !logueado },
+    { id: 'register',  label: 'Registrarse',       visible: !logueado },
+    { id: 'perfil',    label: 'Mi Perfil',         visible: logueado },
+    { id: 'admin',     label: 'Admin',             visible: logueado && admin }, // Solo ADMIN
+  ].filter(item => item.visible);
+
   const renderVista = () => {
     switch (vistaActiva) {
       case 'catalogo':  return <RecetaList />;
-      case 'login':     return <UserLogin />;
+      case 'login':     return <UserLogin onLoginExitoso={handleLoginExitoso} />;
       case 'register':  return <UserRegister />;
       case 'perfil':    return <UserProfile />;
-      case 'admin':     return <AdminRecetas />;
+      case 'admin':
+        // Doble chequeo: si alguien navega directo a 'admin' sin ser admin, lo bloqueamos
+        return admin
+          ? <AdminRecetas />
+          : <div style={{ padding: '2rem', color: 'red' }}>⛔ No tenés permiso para acceder a esta sección.</div>;
       default:          return <RecetaList />;
     }
   };
@@ -45,7 +64,6 @@ function App() {
           <span className="brand-name">RecetaMarket</span>
         </div>
 
-        {/* Hamburguesa mobile */}
         <button
           className={`hamburger ${menuAbierto ? 'open' : ''}`}
           onClick={() => setMenuAbierto(!menuAbierto)}
@@ -64,6 +82,11 @@ function App() {
               {item.label}
             </button>
           ))}
+          {logueado && (
+            <button className="nav-btn" onClick={handleLogout}>
+              🚪 Cerrar Sesión
+            </button>
+          )}
         </nav>
       </header>
 
