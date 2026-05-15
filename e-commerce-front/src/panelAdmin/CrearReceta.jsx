@@ -64,11 +64,7 @@ const CrearReceta = ({ onRecetaCreada, onCancelar }) => {
         nombre: formData.nombre,
         descripcion: formData.descripcion,
         precio: parseFloat(formData.precio),
-
-        // Si tu DTO espera lista
-        categoriasIds: [
-          parseInt(formData.categoriaId)
-        ]
+        categorias: [{ id: parseInt(formData.categoriaId) }]
       };
 
       console.log('Payload enviado:', payload);
