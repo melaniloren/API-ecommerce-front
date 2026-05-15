@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import fetchConAuth from '../utils/fetchConAuth';
 
 const CrearReceta = ({ onRecetaCreada, onCancelar }) => {
 
@@ -72,13 +73,10 @@ const CrearReceta = ({ onRecetaCreada, onCancelar }) => {
 
       console.log('Payload enviado:', payload);
 
-      const response = await fetch(
+      const response = await fetchConAuth(
         'http://localhost:8080/api/recetas',
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
           body: JSON.stringify(payload)
         }
       );
