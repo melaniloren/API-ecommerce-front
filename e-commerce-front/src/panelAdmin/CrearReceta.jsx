@@ -64,7 +64,7 @@ const CrearReceta = ({ onRecetaCreada, onCancelar }) => {
         nombre: formData.nombre,
         descripcion: formData.descripcion,
         precio: parseFloat(formData.precio),
-        categorias: [{ id: parseInt(formData.categoriaId) }]
+        categorias: [parseInt(formData.categoriaId)]
       };
 
       console.log('Payload enviado:', payload);
