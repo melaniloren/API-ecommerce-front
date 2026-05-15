@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const UserLogin = () => {
+const UserLogin = ({ onLoginExitoso }) => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -28,6 +28,7 @@ const UserLogin = () => {
       const token = await response.text();
       localStorage.setItem("token", token);
       console.log("Login exitoso:", token);
+      onLoginExitoso?.();
     } catch (err) {
       setError(err.message);
     } finally {
