@@ -29,7 +29,12 @@ export const obtenerRol = () => {
  * Devuelve true si el usuario logueado tiene rol ADMIN.
  */
 export const esAdmin = () => {
-  const rol = obtenerRol();
-  // Spring Security prefija los roles con "ROLE_"
-  return rol === "ROLE_ADMIN" || rol === "ADMIN";
+  const token = localStorage.getItem('token');
+  if (!token) return false;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.roles?.includes('ADMIN') || payload.roles?.includes('ROLE_ADMIN');
+  } catch {
+    return false;
+  }
 };

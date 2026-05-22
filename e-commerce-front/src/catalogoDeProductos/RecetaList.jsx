@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-// import './ProductList.css'; // Acordate de cambiarle el nombre al archivo CSS si lo renombrás
+import { Link } from 'react-router-dom';
+// import './ProductList.css';
 
 const RecetaList = () => {
     const [recetas, setRecetas] = useState([]);
@@ -9,7 +10,6 @@ const RecetaList = () => {
     useEffect(() => {
         const fetchRecetas = async () => {
             try {
-                // Apuntamos al endpoint exacto de tu controlador de recetas
                 const response = await fetch('http://localhost:8080/api/recetas');
                 if (!response.ok) {
                     throw new Error('Error al cargar las recetas');
@@ -29,7 +29,6 @@ const RecetaList = () => {
     if (loading) return <div>Cargando el catálogo de recetas...</div>;
     if (error) return <div>Error: {error}</div>;
 
-    // Nos aseguramos de que sea un array
     const items = Array.isArray(recetas) ? recetas : [];
 
     return (
@@ -39,16 +38,16 @@ const RecetaList = () => {
                 {items.length === 0 && <div>No hay recetas disponibles en este momento.</div>}
 
                 {items.map(receta => {
-                    // Extraemos los datos basándonos exactamente en tu RecetaDTO.java
                     const id = receta.id;
                     const name = receta.nombre ?? 'Sin nombre';
                     const desc = receta.descripcion ?? 'Sin descripción';
                     const price = receta.precio ?? 0;
-                    const categorias = receta.categorias ?? []; // Array de CategoriaDTO
+                    const categorias = receta.categorias ?? [];
 
                     return (
-                        <a
-                            href={`/recetas/${id}`}
+                        //cambio: <a href> → <Link to>
+                        <Link
+                            to={`/recetas/${id}`}
                             key={id || Math.random()}
                             style={{ textDecoration: 'none', color: 'inherit' }}
                         >
@@ -62,8 +61,6 @@ const RecetaList = () => {
                                 transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                                 backgroundColor: '#fff'
                             }}>
-
-                                {/* Placeholder para la imagen (ya que RecetaDTO no tiene atributo imagen) */}
                                 <div style={{
                                     width: '100%',
                                     height: '150px',
@@ -80,7 +77,6 @@ const RecetaList = () => {
 
                                 <h3 style={{ margin: '0.5rem 0' }}>{name}</h3>
 
-                                {/* Mostramos las etiquetas de la categoría si las tiene, usando CategoriaDTO */}
                                 {categorias.length > 0 && (
                                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                         {categorias.map(cat => (
@@ -103,13 +99,12 @@ const RecetaList = () => {
                                 </p>
 
                                 <p style={{ color: '#666', margin: '0', fontSize: '0.9rem' }}>
-                                    {/* Si la descripción es muy larga, la cortamos para que las tarjetas queden parejas */}
                                     {desc.length > 80 ? desc.substring(0, 80) + '...' : desc}
                                 </p>
 
                                 <span style={{ marginTop: '0.5rem', color: '#0a58ca', fontWeight: '500' }}>Ver detalle de la receta →</span>
                             </div>
-                        </a>
+                        </Link>
                     );
                 })}
             </div>
