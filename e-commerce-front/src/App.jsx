@@ -8,7 +8,7 @@ import UserLogin from './gestionDeUsuarios/UserLogin';
 import UserRegister from './gestionDeUsuarios/UserRegister';
 import UserProfile from './gestionDeUsuarios/UserProfile';
 import AdminRecetas from './panelAdmin/AdminRecetas';
-import './App.css';
+import './styles/App.css';
 
 function App() {
   return (
