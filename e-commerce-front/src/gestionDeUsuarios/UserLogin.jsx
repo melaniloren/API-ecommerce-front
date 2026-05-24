@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const UserLogin = ({ onLoginExitoso }) => {
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -27,8 +29,8 @@ const UserLogin = ({ onLoginExitoso }) => {
 
       const token = await response.text();
       localStorage.setItem("token", token);
-      console.log("Login exitoso:", token);
       onLoginExitoso?.();
+      navigate("/perfil");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -37,57 +39,65 @@ const UserLogin = ({ onLoginExitoso }) => {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "400px",
-        margin: "2rem auto",
-        padding: "1rem",
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-      }}
-    >
-      <h2>Iniciar Sesión</h2>
-      {error && (
-        <div style={{ color: "red", marginBottom: "1rem" }}>Error: {error}</div>
-      )}
+    <section className="auth-page">
+      <div className="auth-shell">
+        <aside className="auth-aside" aria-hidden="true">
+          <p className="section-kicker">Volvé a tu cocina</p>
+          <h2>Guardá favoritas, comprá más rápido y seguí tus recetas.</h2>
+          <div className="auth-plate">
+            <span>🥘</span>
+          </div>
+          <div className="auth-mini-card">
+            <strong>Tip del día</strong>
+            <span>Prepará tus ingredientes antes de empezar.</span>
+          </div>
+        </aside>
 
-      <form
-        onSubmit={handleLogin}
-        style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-      >
-        <input
-          type="email"
-          name="email"
-          placeholder="Correo electrónico"
-          value={credentials.email}
-          onChange={handleChange}
-          required
-          style={{ padding: "0.5rem" }}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Contraseña"
-          value={credentials.password}
-          onChange={handleChange}
-          required
-          style={{ padding: "0.5rem" }}
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: "0.75rem",
-            backgroundColor: "#2D3277",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-          }}
-        >
-          {loading ? "Ingresando..." : "Ingresar"}
-        </button>
-      </form>
-    </div>
+        <div className="auth-card">
+          <div className="auth-header">
+            <p className="section-kicker">Ingresar</p>
+            <h1>Iniciar sesión</h1>
+            <p>Accedé a tu cuenta para continuar con RecetaMarket.</p>
+          </div>
+
+          {error && <div className="auth-alert auth-alert-error">Error: {error}</div>}
+
+          <form className="auth-form" onSubmit={handleLogin}>
+            <label>
+              Correo electrónico
+              <input
+                type="email"
+                name="email"
+                placeholder="tu@email.com"
+                value={credentials.email}
+                onChange={handleChange}
+                required
+              />
+            </label>
+
+            <label>
+              Contraseña
+              <input
+                type="password"
+                name="password"
+                placeholder="Ingresá tu contraseña"
+                value={credentials.password}
+                onChange={handleChange}
+                required
+              />
+            </label>
+
+            <button className="auth-submit" type="submit" disabled={loading}>
+              {loading ? "Ingresando..." : "Ingresar"}
+            </button>
+          </form>
+
+          <p className="auth-switch">
+            ¿Todavía no tenés cuenta? <Link to="/register">Registrate</Link>
+          </p>
+        </div>
+      </div>
+    </section>
   );
 };
 

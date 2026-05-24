@@ -1,115 +1,101 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-// import './ProductList.css';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const RecetaList = () => {
-    const [recetas, setRecetas] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [recetas, setRecetas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchRecetas = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/api/recetas');
-                if (!response.ok) {
-                    throw new Error('Error al cargar las recetas');
-                }
-                const data = await response.json();
-                setRecetas(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    const fetchRecetas = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/recetas");
+        if (!response.ok) {
+          throw new Error("Error al cargar las recetas");
+        }
+        const data = await response.json();
+        setRecetas(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        fetchRecetas();
-    }, []);
+    fetchRecetas();
+  }, []);
 
-    if (loading) return <div>Cargando el catálogo de recetas...</div>;
-    if (error) return <div>Error: {error}</div>;
+  if (loading) {
+    return <div className="catalog-state">Cargando el catálogo de recetas...</div>;
+  }
 
-    const items = Array.isArray(recetas) ? recetas : [];
+  if (error) {
+    return <div className="catalog-state catalog-state-error">Error: {error}</div>;
+  }
 
-    return (
+  const items = Array.isArray(recetas) ? recetas : [];
+
+  return (
+    <section className="catalog-section">
+      <div className="catalog-heading">
         <div>
-            <h1>Catálogo de Recetas</h1>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem', padding: '1rem' }}>
-                {items.length === 0 && <div>No hay recetas disponibles en este momento.</div>}
-
-                {items.map(receta => {
-                    const id = receta.id;
-                    const name = receta.nombre ?? 'Sin nombre';
-                    const desc = receta.descripcion ?? 'Sin descripción';
-                    const price = receta.precio ?? 0;
-                    const categorias = receta.categorias ?? [];
-
-                    return (
-                        //cambio: <a href> → <Link to>
-                        <Link
-                            to={`/recetas/${id}`}
-                            key={id || Math.random()}
-                            style={{ textDecoration: 'none', color: 'inherit' }}
-                        >
-                            <div style={{
-                                border: '1px solid #ddd',
-                                borderRadius: '8px',
-                                padding: '1rem',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '0.5rem',
-                                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                                backgroundColor: '#fff'
-                            }}>
-                                <div style={{
-                                    width: '100%',
-                                    height: '150px',
-                                    backgroundColor: '#f0f0f0',
-                                    borderRadius: '4px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: '#999',
-                                    fontStyle: 'italic'
-                                }}>
-                                    Sin imagen
-                                </div>
-
-                                <h3 style={{ margin: '0.5rem 0' }}>{name}</h3>
-
-                                {categorias.length > 0 && (
-                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                        {categorias.map(cat => (
-                                            <span key={cat.idCategoria} style={{
-                                                fontSize: '0.75rem',
-                                                backgroundColor: '#e9ecef',
-                                                color: '#495057',
-                                                padding: '0.2rem 0.5rem',
-                                                borderRadius: '12px',
-                                                fontWeight: 'bold'
-                                            }}>
-                                                {cat.nombre}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-
-                                <p style={{ color: '#2D3277', fontSize: '1.25rem', fontWeight: 'bold', margin: '0' }}>
-                                    ${Number(price).toLocaleString('es-AR')}
-                                </p>
-
-                                <p style={{ color: '#666', margin: '0', fontSize: '0.9rem' }}>
-                                    {desc.length > 80 ? desc.substring(0, 80) + '...' : desc}
-                                </p>
-
-                                <span style={{ marginTop: '0.5rem', color: '#0a58ca', fontWeight: '500' }}>Ver detalle de la receta →</span>
-                            </div>
-                        </Link>
-                    );
-                })}
-            </div>
+          <p className="section-kicker">Elegí tu próxima comida</p>
+          <h1>Catálogo de recetas</h1>
         </div>
-    );
+        <p>
+          Explorá opciones caseras, simples y listas para sumar a tu mesa.
+        </p>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="catalog-empty">
+          No hay recetas disponibles en este momento.
+        </div>
+      ) : (
+        <div className="receta-grid">
+          {items.map((receta) => {
+            const id = receta.id;
+            const name = receta.nombre ?? "Sin nombre";
+            const desc = receta.descripcion ?? "Sin descripción";
+            const price = receta.precio ?? 0;
+            const categorias = receta.categorias ?? [];
+
+            return (
+              <Link to={`/recetas/${id}`} key={id || name} className="receta-link">
+                <article className="receta-card">
+                  <div className="receta-image" aria-hidden="true">
+                    <span>{name.charAt(0).toUpperCase()}</span>
+                  </div>
+
+                  <div className="receta-card-body">
+                    <h3>{name}</h3>
+
+                    {categorias.length > 0 && (
+                      <div className="receta-tags">
+                        {categorias.map((cat) => (
+                          <span key={cat.idCategoria}>{cat.nombre}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    <p className="receta-precio">
+                      ${Number(price).toLocaleString("es-AR")}
+                    </p>
+
+                    <p className="receta-desc">
+                      {desc.length > 92 ? `${desc.substring(0, 92)}...` : desc}
+                    </p>
+
+                    <span className="receta-detail">Ver detalle</span>
+                  </div>
+                </article>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
 };
 
 export default RecetaList;

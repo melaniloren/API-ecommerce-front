@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import RutaProtegida from "./routes/RutaProtegida";
@@ -10,34 +10,53 @@ import UserProfile from "./gestionDeUsuarios/UserProfile";
 import AdminRecetas from "./panelAdmin/AdminRecetas";
 import "./styles/App.css";
 
+function AppContent() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
+  return (
+    <div className="app-wrapper">
+      <Navbar />
+      {isHome && <Hero />}
+
+      <main className={isHome ? "main-content home-content" : "main-content"}>
+        <Routes>
+          <Route path="/" element={<RecetaList />} />
+          <Route path="/catalogo" element={<RecetaList />} />
+          <Route path="/recetas/:id" element={<RecetaDetalle />} />
+          <Route path="/login" element={<UserLogin />} />
+          <Route path="/register" element={<UserRegister />} />
+          <Route
+            path="/perfil"
+            element={
+              <RutaProtegida>
+                <UserProfile />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RutaProtegida soloAdmin>
+                <AdminRecetas />
+              </RutaProtegida>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+
+      <footer className="footer">
+        <p>© 2025 RecetaMarket · Hecho con amor y mucho sabor</p>
+      </footer>
+    </div>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <div className="app-wrapper">
-        <Navbar />
-
-        <Hero /> 
-        
-          <Routes>
-            <Route path="/" element={<RecetaList />} />
-            <Route path="/catalogo" element={<RecetaList />} />
-            <Route path="/recetas/:id" element={<RecetaDetalle />} />
-            <Route path="/login" element={<UserLogin />} />
-            <Route path="/register" element={<UserRegister />} />
-            <Route path="/perfil" element={
-              <RutaProtegida><UserProfile /></RutaProtegida>
-            } />
-            <Route path="/admin" element={
-              <RutaProtegida soloAdmin><AdminRecetas /></RutaProtegida>
-            } />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-      
-
-        <footer className="footer">
-          <p>© 2025 RecetaMarket · Hecho con ❤️ y mucho sabor</p>
-        </footer>
-      </div>
+      <AppContent />
     </BrowserRouter>
   );
 }

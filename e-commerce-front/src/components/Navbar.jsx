@@ -1,69 +1,106 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { esAdmin } from '../utils/auth'
-import '../styles/Navbar.css'
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { esAdmin } from "../utils/auth";
+import "../styles/Navbar.css";
 
 function Navbar() {
-  const location = useLocation()
-  const navigate  = useNavigate()
-  const logueado  = !!localStorage.getItem('token')
+  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const logueado = !!localStorage.getItem("token");
 
-  const isActive = (path) => location.pathname === path
+  const isActive = (path) => location.pathname === path;
+  const closeMenu = () => setMenuOpen(false);
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/')
-    window.location.reload()
-  }
+    localStorage.removeItem("token");
+    closeMenu();
+    navigate("/");
+    window.location.reload();
+  };
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
-
-        <Link to="/" className="navbar-brand">
-          🥘 RecetaMarket
+        <Link to="/" className="navbar-brand" onClick={closeMenu}>
+          <span className="brand-mark">R</span>
+          RecetaMarket
         </Link>
 
-        <ul className="nav-menu">
+        <button
+          className="hamburger"
+          type="button"
+          aria-label="Abrir menú"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <ul className={menuOpen ? "nav-menu nav-open" : "nav-menu"}>
           <li>
-            <Link to="/" className={isActive('/') ? 'nav-link active' : 'nav-link'}>
+            <Link
+              to="/"
+              className={isActive("/") ? "nav-link active" : "nav-link"}
+              onClick={closeMenu}
+            >
               Inicio
             </Link>
           </li>
           <li>
-            <Link to="/catalogo" className={isActive('/catalogo') ? 'nav-link active' : 'nav-link'}>
+            <Link
+              to="/catalogo"
+              className={isActive("/catalogo") ? "nav-link active" : "nav-link"}
+              onClick={closeMenu}
+            >
               Catálogo
             </Link>
           </li>
 
-          {/* Solo si NO está logueado */}
           {!logueado && (
             <>
               <li>
-                <Link to="/login" className={isActive('/login') ? 'nav-link active' : 'nav-link'}>
-                  Iniciar Sesión
+                <Link
+                  to="/login"
+                  className={isActive("/login") ? "nav-link active" : "nav-link"}
+                  onClick={closeMenu}
+                >
+                  Iniciar sesión
                 </Link>
               </li>
               <li>
-                <Link to="/register" className={isActive('/register') ? 'nav-link active' : 'nav-link'}>
+                <Link
+                  to="/register"
+                  className={isActive("/register") ? "nav-link active" : "nav-link"}
+                  onClick={closeMenu}
+                >
                   Registrarse
                 </Link>
               </li>
             </>
           )}
 
-          {/* Solo si está logueado */}
           {logueado && (
             <>
               <li>
-                <Link to="/perfil" className={isActive('/perfil') ? 'nav-link active' : 'nav-link'}>
-                  Mi Perfil
+                <Link
+                  to="/perfil"
+                  className={isActive("/perfil") ? "nav-link active" : "nav-link"}
+                  onClick={closeMenu}
+                >
+                  Mi perfil
                 </Link>
               </li>
 
-              {/* Solo si es ADMIN */}
               {esAdmin() && (
                 <li>
-                  <Link to="/admin" className={isActive('/admin') ? 'nav-link active' : 'nav-link'}>
+                  <Link
+                    to="/admin"
+                    className={isActive("/admin") ? "nav-link active" : "nav-link"}
+                    onClick={closeMenu}
+                  >
                     Admin
                   </Link>
                 </li>
@@ -71,16 +108,15 @@ function Navbar() {
 
               <li>
                 <button className="nav-link nav-logout" onClick={handleLogout}>
-                  🚪 Cerrar Sesión
+                  Cerrar sesión
                 </button>
               </li>
             </>
           )}
         </ul>
-
       </div>
     </nav>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;
