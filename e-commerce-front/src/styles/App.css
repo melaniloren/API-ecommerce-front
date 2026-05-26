@@ -294,7 +294,7 @@ hr {
   .hamburger { display: flex; }
 
   .nav-links {
-    background: linear-gradient(160deg, var(--color-primary), #9B2335);
+    background: linear-gradient(160deg, var(--color-primary), var(--color-primary-h));
     display: flex;
     flex-direction: column;
     gap: .4rem;
@@ -1088,5 +1088,165 @@ hr {
 
   .recipe-detail-art {
     max-width: 100%;
+  }
+}
+
+/* ================================================================
+   HOME REDESIGN
+   ================================================================ */
+.home-content {
+  background: #fbf7f1;
+  max-width: none;
+  padding: 0 clamp(1.25rem, 6vw, 5rem) 5rem;
+}
+
+.home-inspiration {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 3.6rem 0 0;
+}
+
+.home-inspiration-heading {
+  align-items: end;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.home-inspiration-heading h1 {
+  color: var(--color-primary);
+  font-size: clamp(2rem, 3vw, 2.55rem);
+  line-height: 1.05;
+}
+
+.home-inspiration-heading p {
+  color: #4e3a35;
+  margin-top: .35rem;
+}
+
+.home-inspiration-heading a {
+  color: var(--color-primary);
+  font-size: .9rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.inspiration-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: repeat(2, 230px);
+}
+
+.inspiration-card {
+  align-items: end;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .28), rgba(99, 18, 24, .72)),
+    radial-gradient(rgba(0, 0, 0, .04) .8px, transparent .8px),
+    #eadfdd;
+  background-size: auto, 8px 8px, auto;
+  border-radius: 18px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 1.55rem;
+  position: relative;
+}
+
+.inspiration-card .inspiration-icon {
+  border-color: rgba(77, 39, 43, .28);
+  left: 50%;
+  position: absolute;
+  top: 48%;
+  transform: translate(-50%, -50%) scale(1.25);
+}
+
+.inspiration-card .inspiration-icon::before,
+.inspiration-card .inspiration-icon::after {
+  border-color: rgba(77, 39, 43, .28);
+}
+
+.inspiration-card small {
+  display: block;
+  font-size: .74rem;
+  letter-spacing: .08em;
+  margin-bottom: .3rem;
+  text-transform: uppercase;
+}
+
+.inspiration-card h2 {
+  color: #fff;
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  line-height: 1.1;
+}
+
+.feature-large,
+.feature-tall {
+  grid-row: span 2;
+}
+
+.footer {
+  align-items: center;
+  background: #f3eee7;
+  border-top: 1px solid rgba(192, 57, 43, .22);
+  color: #4e3a35;
+  display: flex;
+  font-size: .9rem;
+  gap: 2rem;
+  justify-content: space-between;
+  padding: 2.2rem clamp(1.25rem, 6vw, 5rem);
+  text-align: left;
+}
+
+.footer strong {
+  color: var(--color-primary);
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  margin-bottom: .35rem;
+}
+
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.8rem;
+}
+
+.footer a {
+  color: #4e3a35;
+  font-size: .78rem;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .home-inspiration-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .inspiration-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+
+  .inspiration-card {
+    min-height: 210px;
+  }
+
+  .feature-large,
+  .feature-tall {
+    grid-row: auto;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

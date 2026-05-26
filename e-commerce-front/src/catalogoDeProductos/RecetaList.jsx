@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const RecetaList = () => {
+const homeCategories = [
+  { title: "Saludables & Frescos", eyebrow: "Favoritos", className: "feature-large" },
+  { title: "Pizzas", className: "feature-small" },
+  { title: "Carnes", className: "feature-small" },
+  { title: "Dulces", className: "feature-tall" },
+];
+
+const RecetaList = ({ variant = "catalog" }) => {
   const [recetas, setRecetas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,6 +32,32 @@ const RecetaList = () => {
     fetchRecetas();
   }, []);
 
+  if (variant === "home") {
+    return (
+      <section className="home-inspiration">
+        <div className="home-inspiration-heading">
+          <div>
+            <h1>Inspiración para hoy</h1>
+            <p>Descubrí las categorías más buscadas por nuestra comunidad.</p>
+          </div>
+          <Link to="/catalogo">Ver todo el catálogo →</Link>
+        </div>
+
+        <div className="inspiration-grid">
+          {homeCategories.map((category) => (
+            <article className={`inspiration-card ${category.className}`} key={category.title}>
+              <span className="inspiration-icon" aria-hidden="true"></span>
+              <div>
+                {category.eyebrow && <small>{category.eyebrow}</small>}
+                <h2>{category.title}</h2>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   if (loading) {
     return <div className="catalog-state">Cargando el catálogo de recetas...</div>;
   }
@@ -42,9 +75,7 @@ const RecetaList = () => {
           <p className="section-kicker">Elegí tu próxima comida</p>
           <h1>Catálogo de recetas</h1>
         </div>
-        <p>
-          Explorá opciones caseras, simples y listas para sumar a tu mesa.
-        </p>
+        <p>Explorá opciones caseras, simples y listas para sumar a tu mesa.</p>
       </div>
 
       {items.length === 0 ? (

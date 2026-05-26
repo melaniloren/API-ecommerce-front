@@ -21,7 +21,7 @@ function AppContent() {
 
       <main className={isHome ? "main-content home-content" : "main-content"}>
         <Routes>
-          <Route path="/" element={<RecetaList />} />
+          <Route path="/" element={<RecetaList variant="home" />} />
           <Route path="/catalogo" element={<RecetaList />} />
           <Route path="/recetas/:id" element={<RecetaDetalle />} />
           <Route path="/login" element={<UserLogin />} />
@@ -47,7 +47,16 @@ function AppContent() {
       </main>
 
       <footer className="footer">
-        <p>© 2025 RecetaMarket · Hecho con amor y mucho sabor</p>
+        <div>
+          <strong>RecetaMarket</strong>
+          <p>© 2024 RecetaMarket. Sabores artesanales en tu hogar.</p>
+        </div>
+        <nav aria-label="Enlaces secundarios">
+          <a href="#">Privacidad</a>
+          <a href="#">Términos</a>
+          <a href="#">Contacto</a>
+          <a href="#">Preguntas Frecuentes</a>
+        </nav>
       </footer>
     </div>
   );

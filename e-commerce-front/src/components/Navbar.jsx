@@ -23,7 +23,6 @@ function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-brand" onClick={closeMenu}>
-          <span className="brand-mark">R</span>
           RecetaMarket
         </Link>
 

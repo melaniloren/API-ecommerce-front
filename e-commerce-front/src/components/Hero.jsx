@@ -38,18 +38,28 @@ function Hero() {
       <div className="hero-visual" aria-hidden="true">
         <div className="hero-recipe-card">
           <div className="hero-card-header">
-            <span className="hero-card-dot"></span>
-            Receta destacada
+            <span>
+              <span className="hero-card-dot"></span>
+              Receta destacada
+            </span>
+            <strong>+120 recetas</strong>
           </div>
           <div className="hero-plate">
-            <span className="hero-plate-main">🍲</span>
+            <span className="hero-image-icon"></span>
           </div>
           <h2>Risotto cremoso de estación</h2>
-          <p>Listo en 35 min · Nivel fácil</p>
-          <div className="hero-rating">★★★★★</div>
+          <p className="hero-meta">
+            ◷ Listo en 35 min <span></span>▥ Nivel fácil
+          </p>
+          <div className="hero-card-footer">
+            <div className="hero-rating">☆ ☆ ☆ ☆ ☆</div>
+            <button type="button" aria-label="Agregar receta">+</button>
+          </div>
         </div>
-        <div className="hero-floating-badge hero-badge-top">+120 recetas</div>
-        <div className="hero-floating-badge hero-badge-bottom">Desde $4.500</div>
+        <div className="hero-floating-badge">
+          <span>Por porción</span>
+          Desde $4.500
+        </div>
       </div>
     </section>
   );
