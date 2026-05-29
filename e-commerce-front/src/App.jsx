@@ -1,4 +1,8 @@
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import "./styles/App.css";
+// import { AuthProvider } from './features/auth/context/AuthContext'
+import { FavoriteProvider } from "./contexts/FavoriteContext";
+import { CartProvider } from "./contexts/CartContext";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import RutaProtegida from "./routes/RutaProtegida";
@@ -10,100 +14,100 @@ import UserLogin from "./gestionDeUsuarios/UserLogin";
 import UserRegister from "./gestionDeUsuarios/UserRegister";
 import UserProfile from "./gestionDeUsuarios/UserProfile";
 import AdminRecetas from "./panelAdmin/AdminRecetas";
-import { FavoriteProvider } from "./contexts/FavoriteContext";
-import { CartProvider } from "./contexts/CartContext";
-import "./styles/App.css";
 
-function AppContent() {
+function App() {
+  // useLocation funciona porque el <BrowserRouter> ahora envuelve a <App /> en main.jsx.
+  // Detectamos si estamos en la home para aplicarle la clase "home-content" (fondo crema + ancho completo).
   const location = useLocation();
   const isHome = location.pathname === "/";
 
   return (
-    <div className="app-wrapper">
-      <Navbar />
-      {isHome && <Hero />}
+    // <AuthProvider>
+    <FavoriteProvider>
+      <CartProvider>
+        <div className="app-wrapper">
+          {/* Navbar siempre visible en todas las páginas */}
+          <Navbar />
 
-      <main className={isHome ? "main-content home-content" : "main-content"}>
-        <Routes>
-          <Route path="/" element={<RecetaList variant="home" />} />
-          <Route path="/catalogo" element={<RecetaList />} />
-          <Route path="/recetas/:id" element={<RecetaDetalle />} />
-          <Route path="/login" element={<UserLogin />} />
-          <Route path="/register" element={<UserRegister />} />
+          <main className={isHome ? "main-content home-content" : "main-content"}>
+            {/* aquí se definen todas las rutas o links de la app, que luego serán usadas en diferentes componentes */}
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <>
+                    <Hero />
+                    <RecetaList variant="home" />
+                  </>
+                }
+              />
+              <Route path="/catalogo" element={<RecetaList />} />
+              <Route path="/recetas/:id" element={<RecetaDetalle />} />
+              <Route path="/login" element={<UserLogin />} />
+              <Route path="/register" element={<UserRegister />} />
 
-          {/* RUTAS PROTEGIDAS para favoritos */}
-          <Route
-            path="/favoritos"
-            element={
-              <RutaProtegida>
-                <Favorite />
-              </RutaProtegida>
-            }
-          />
-          <Route
-            path="/favoritos/:id"
-            element={
-              <RutaProtegida>
-                <Favorite />
-              </RutaProtegida>
-            }
-          />
+              {/* Rutas protegidas: requieren sesión iniciada */}
+              <Route
+                path="/favoritos"
+                element={
+                  <RutaProtegida>
+                    <Favorite />
+                  </RutaProtegida>
+                }
+              />
+              <Route
+                path="/favoritos/:id"
+                element={
+                  <RutaProtegida>
+                    <Favorite />
+                  </RutaProtegida>
+                }
+              />
+              <Route
+                path="/carrito"
+                element={
+                  <RutaProtegida>
+                    <Cart />
+                  </RutaProtegida>
+                }
+              />
+              <Route
+                path="/perfil"
+                element={
+                  <RutaProtegida>
+                    <UserProfile />
+                  </RutaProtegida>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <RutaProtegida soloAdmin>
+                    <AdminRecetas />
+                  </RutaProtegida>
+                }
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
 
-          {/* RUTA PROTEGIDA del carrito */}
-          <Route
-            path="/carrito"
-            element={
-              <RutaProtegida>
-                <Cart />
-              </RutaProtegida>
-            }
-          />
-
-          <Route
-            path="/perfil"
-            element={
-              <RutaProtegida>
-                <UserProfile />
-              </RutaProtegida>
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <RutaProtegida soloAdmin>
-                <AdminRecetas />
-              </RutaProtegida>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-
-      <footer className="footer">
-        <div>
-          <strong>RecetaMarket</strong>
-          <p>© 2024 RecetaMarket. Sabores artesanales en tu hogar.</p>
+          {/* Footer siempre visible */}
+          <footer className="footer">
+            <div>
+              <strong>RecetaMarket</strong>
+              <p>© 2024 RecetaMarket. Sabores artesanales en tu hogar.</p>
+            </div>
+            <nav aria-label="Enlaces secundarios">
+              <a href="#">Privacidad</a>
+              <a href="#">Términos</a>
+              <a href="#">Contacto</a>
+              <a href="#">Preguntas Frecuentes</a>
+            </nav>
+          </footer>
         </div>
-        <nav aria-label="Enlaces secundarios">
-          <a href="#">Privacidad</a>
-          <a href="#">Términos</a>
-          <a href="#">Contacto</a>
-          <a href="#">Preguntas Frecuentes</a>
-        </nav>
-      </footer>
-    </div>
-  );
-}
-
-function App() {
-  return (
-    <BrowserRouter>
-      <FavoriteProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
-      </FavoriteProvider>
-    </BrowserRouter>
+      </CartProvider>
+    </FavoriteProvider>
+    // </AuthProvider>
   );
 }
 
