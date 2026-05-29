@@ -1,8 +1,12 @@
+// Importamos React y los hooks necesarios.
 import { useEffect, useState } from "react";
+// Importamos componentes de routing.
 import { Link, useNavigate } from "react-router-dom";
+// Importamos nuestros custom hooks para acceder al contexto de favoritos y al carrito.
 import { useFavorite } from "../contexts/FavoriteContext";
 import { useCart } from "../contexts/CartContext";
 
+// Categorías hardcodeadas que se muestran solo en la vista "home".
 const homeCategories = [
   { title: "Saludables & Frescos", eyebrow: "Favoritos", className: "feature-large" },
   { title: "Pizzas", className: "feature-small" },
@@ -10,17 +14,25 @@ const homeCategories = [
   { title: "Dulces", className: "feature-tall" },
 ];
 
+// --- COMPONENTE CONSUMIDOR: LISTA DE RECETAS ---
+// Este componente es responsable de mostrar el catálogo y de permitir agregar
+// recetas a favoritos y al carrito usando los contextos correspondientes.
 const RecetaList = ({ variant = "catalog" }) => {
+  // Estado local: lista de recetas que vienen de la API.
   const [recetas, setRecetas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Usamos los custom hooks para obtener funciones de los contextos.
+  // Ya no necesitamos useContext directamente, queda más limpio.
   const { addToFavorite, esFavorito } = useFavorite();
   const { addToCart } = useCart();
 
+  // useNavigate para redirigir al login si el usuario no tiene sesión iniciada.
   const navigate = useNavigate();
   const logueado = !!localStorage.getItem("token");
 
+  // useEffect para cargar las recetas desde la API una sola vez al montar el componente.
   useEffect(() => {
     const fetchRecetas = async () => {
       try {
@@ -38,8 +50,9 @@ const RecetaList = ({ variant = "catalog" }) => {
     };
 
     fetchRecetas();
-  }, []);
+  }, []); // El array vacío asegura que se ejecute solo al montar.
 
+  // Variante "home": muestra solo las categorías destacadas, no el catálogo entero.
   if (variant === "home") {
     return (
       <section className="home-inspiration">
@@ -66,17 +79,18 @@ const RecetaList = ({ variant = "catalog" }) => {
     );
   }
 
+  // Renderizado condicional: mientras se carga o si hubo error.
   if (loading) {
     return <div className="catalog-state">Cargando el catálogo de recetas...</div>;
   }
-
   if (error) {
     return <div className="catalog-state catalog-state-error">Error: {error}</div>;
   }
 
   const items = Array.isArray(recetas) ? recetas : [];
 
-  // Handler del corazón
+  // Handler del corazón de favoritos.
+  // Frena la navegación del Link envolvente y, si no hay sesión, manda al login.
   const handleFavoriteClick = (e, receta) => {
     e.preventDefault();
     e.stopPropagation();
@@ -87,7 +101,7 @@ const RecetaList = ({ variant = "catalog" }) => {
     addToFavorite(receta);
   };
 
-  // Handler del carrito
+  // Handler del botón "Agregar al carrito" (misma lógica que el corazón).
   const handleCartClick = (e, receta) => {
     e.preventDefault();
     e.stopPropagation();
@@ -98,6 +112,7 @@ const RecetaList = ({ variant = "catalog" }) => {
     addToCart(receta);
   };
 
+  // Renderizamos la lista de recetas.
   return (
     <section className="catalog-section">
       <div className="catalog-heading">
@@ -109,9 +124,7 @@ const RecetaList = ({ variant = "catalog" }) => {
       </div>
 
       {items.length === 0 ? (
-        <div className="catalog-empty">
-          No hay recetas disponibles en este momento.
-        </div>
+        <div className="catalog-empty">No hay recetas disponibles en este momento.</div>
       ) : (
         <div className="receta-grid">
           {items.map((receta) => {
@@ -120,11 +133,13 @@ const RecetaList = ({ variant = "catalog" }) => {
             const desc = receta.descripcion ?? "Sin descripción";
             const price = receta.precio ?? 0;
             const categorias = receta.categorias ?? [];
+            // Operador ternario: si no hay sesión, el corazón siempre va vacío.
             const favorito = logueado ? esFavorito(id) : false;
 
             return (
               <Link to={`/recetas/${id}`} key={id || name} className="receta-link">
                 <article className="receta-card" style={{ position: "relative" }}>
+                  {/* Botón del corazón (favoritos) */}
                   <button
                     type="button"
                     onClick={(e) => handleFavoriteClick(e, receta)}
@@ -167,6 +182,7 @@ const RecetaList = ({ variant = "catalog" }) => {
                       {desc.length > 92 ? `${desc.substring(0, 92)}...` : desc}
                     </p>
 
+                    {/* Botón para agregar al carrito */}
                     <button
                       type="button"
                       onClick={(e) => handleCartClick(e, receta)}
@@ -181,7 +197,7 @@ const RecetaList = ({ variant = "catalog" }) => {
                         width: "100%",
                       }}
                     >
-                      🛒 Agregar al carrito
+                      Agregar al carrito
                     </button>
 
                     <span className="receta-detail">Ver detalle</span>
@@ -196,4 +212,5 @@ const RecetaList = ({ variant = "catalog" }) => {
   );
 };
 
+// Exportamos el componente para usarlo en otras partes de la aplicación.
 export default RecetaList;

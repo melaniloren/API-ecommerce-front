@@ -1,18 +1,24 @@
+// Importamos componentes de routing.
 import { Link, useNavigate } from "react-router-dom";
+// Importamos nuestro custom hook para acceder al contexto del carrito.
 import { useCart } from "../contexts/CartContext";
 
+// --- COMPONENTE CONSUMIDOR: PÁGINA DEL CARRITO ---
+// Este componente muestra los productos agregados al carrito, permite modificar
+// cantidades, quitarlos, vaciarlo y "finalizar la compra".
 function Cart() {
-  // useContext (vía custom hook) para traer el estado y funciones del carrito
+  // Usamos el hook `useCart` para obtener el estado y las funciones del carrito.
   const { cartItems, removeFromCart, clearCart, addToCart } = useCart();
+  // useNavigate para redirigir al catálogo desde el botón.
   const navigate = useNavigate();
 
-  // Total con .reduce y operador ternario por si no hay items
+  // Calculamos el total recorriendo todos los items y sumando precio * cantidad.
   const total = cartItems.reduce(
     (acc, item) => acc + Number(item.precio ?? 0) * item.cantidad,
     0
   );
 
-  // Renderizado condicional: carrito vacío
+  // Renderizado condicional: si el carrito está vacío, mostramos un mensaje.
   if (cartItems.length === 0) {
     return (
       <section className="catalog-section">
@@ -32,6 +38,7 @@ function Cart() {
     );
   }
 
+  // Renderizamos la lista de productos del carrito.
   return (
     <section className="catalog-section">
       <div className="catalog-heading">
@@ -46,6 +53,7 @@ function Cart() {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        {/* Recorremos los items del carrito con .map */}
         {cartItems.map((item) => (
           <article
             key={item.id}
@@ -72,7 +80,9 @@ function Cart() {
             </div>
 
             <div style={{ display: "flex", gap: "8px" }}>
+              {/* Botón para sumar 1 unidad (vuelve a llamar a addToCart) */}
               <button onClick={() => addToCart(item)}>+1</button>
+              {/* Botón para quitar el producto del carrito */}
               <button
                 onClick={() => removeFromCart(item.id)}
                 style={{ color: "#e63946" }}
@@ -84,6 +94,7 @@ function Cart() {
         ))}
       </div>
 
+      {/* Sección de total y acciones finales */}
       <div
         style={{
           marginTop: "24px",
@@ -120,4 +131,5 @@ function Cart() {
   );
 }
 
+// Exportamos el componente para usarlo en otras partes de la aplicación.
 export default Cart;
