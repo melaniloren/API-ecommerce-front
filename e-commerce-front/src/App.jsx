@@ -5,11 +5,13 @@ import RutaProtegida from "./routes/RutaProtegida";
 import RecetaList from "./catalogoDeProductos/RecetaList";
 import RecetaDetalle from "./catalogoDeProductos/RecetaDetalle";
 import Favorite from "./catalogoDeProductos/Favorite";
+import Cart from "./catalogoDeProductos/Cart";
 import UserLogin from "./gestionDeUsuarios/UserLogin";
 import UserRegister from "./gestionDeUsuarios/UserRegister";
 import UserProfile from "./gestionDeUsuarios/UserProfile";
 import AdminRecetas from "./panelAdmin/AdminRecetas";
 import { FavoriteProvider } from "./contexts/FavoriteContext";
+import { CartProvider } from "./contexts/CartContext";
 import "./styles/App.css";
 
 function AppContent() {
@@ -43,6 +45,16 @@ function AppContent() {
             element={
               <RutaProtegida>
                 <Favorite />
+              </RutaProtegida>
+            }
+          />
+
+          {/* RUTA PROTEGIDA del carrito */}
+          <Route
+            path="/carrito"
+            element={
+              <RutaProtegida>
+                <Cart />
               </RutaProtegida>
             }
           />
@@ -87,7 +99,9 @@ function App() {
   return (
     <BrowserRouter>
       <FavoriteProvider>
-        <AppContent />
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
       </FavoriteProvider>
     </BrowserRouter>
   );

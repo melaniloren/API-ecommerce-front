@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { esAdmin } from "../utils/auth";
+import { useCart } from "../contexts/CartContext";
 import "../styles/Navbar.css";
 
 function Navbar() {
@@ -8,6 +9,7 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const logueado = !!localStorage.getItem("token");
+  const { cartItems } = useCart();
 
   const isActive = (path) => location.pathname === path;
   const closeMenu = () => setMenuOpen(false);
@@ -90,6 +92,15 @@ function Navbar() {
                   onClick={closeMenu}
                 >
                   Favoritos
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/carrito"
+                  className={isActive("/carrito") ? "nav-link active" : "nav-link"}
+                  onClick={closeMenu}
+                >
+                  🛒 Carrito ({cartItems.length})
                 </Link>
               </li>
               <li>

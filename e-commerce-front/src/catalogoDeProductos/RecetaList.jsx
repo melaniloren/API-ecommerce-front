@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useFavorite } from "../contexts/FavoriteContext";
+import { useCart } from "../contexts/CartContext";
 
 const homeCategories = [
   { title: "Saludables & Frescos", eyebrow: "Favoritos", className: "feature-large" },
@@ -14,10 +15,9 @@ const RecetaList = ({ variant = "catalog" }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // useContext (vía custom hook) para traer addToFavorite y esFavorito
   const { addToFavorite, esFavorito } = useFavorite();
+  const { addToCart } = useCart();
 
-  // useNavigate al principio: si no hay sesión, redirigimos al login al tocar el corazón
   const navigate = useNavigate();
   const logueado = !!localStorage.getItem("token");
 
@@ -76,17 +76,26 @@ const RecetaList = ({ variant = "catalog" }) => {
 
   const items = Array.isArray(recetas) ? recetas : [];
 
-  // Handler del corazón: si no hay sesión, redirige al login con useNavigate
+  // Handler del corazón
   const handleFavoriteClick = (e, receta) => {
     e.preventDefault();
     e.stopPropagation();
-
     if (!logueado) {
       navigate("/login");
       return;
     }
-
     addToFavorite(receta);
+  };
+
+  // Handler del carrito
+  const handleCartClick = (e, receta) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!logueado) {
+      navigate("/login");
+      return;
+    }
+    addToCart(receta);
   };
 
   return (
@@ -111,30 +120,15 @@ const RecetaList = ({ variant = "catalog" }) => {
             const desc = receta.descripcion ?? "Sin descripción";
             const price = receta.precio ?? 0;
             const categorias = receta.categorias ?? [];
-            // Operador ternario: si no hay sesión, mostramos el corazón apagado siempre
             const favorito = logueado ? esFavorito(id) : false;
 
             return (
               <Link to={`/recetas/${id}`} key={id || name} className="receta-link">
                 <article className="receta-card" style={{ position: "relative" }}>
-                  {/* Botón de favorito (corazón) */}
                   <button
                     type="button"
                     onClick={(e) => handleFavoriteClick(e, receta)}
-                    aria-label={
-                      !logueado
-                        ? "Iniciá sesión para guardar favoritos"
-                        : favorito
-                        ? "Quitar de favoritos"
-                        : "Agregar a favoritos"
-                    }
-                    title={
-                      !logueado
-                        ? "Iniciá sesión para guardar favoritos"
-                        : favorito
-                        ? "Quitar de favoritos"
-                        : "Agregar a favoritos"
-                    }
+                    aria-label={favorito ? "Quitar de favoritos" : "Agregar a favoritos"}
                     style={{
                       position: "absolute",
                       top: "10px",
@@ -172,6 +166,23 @@ const RecetaList = ({ variant = "catalog" }) => {
                     <p className="receta-desc">
                       {desc.length > 92 ? `${desc.substring(0, 92)}...` : desc}
                     </p>
+
+                    <button
+                      type="button"
+                      onClick={(e) => handleCartClick(e, receta)}
+                      style={{
+                        marginTop: "10px",
+                        padding: "8px 12px",
+                        background: "#2a9d8f",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        width: "100%",
+                      }}
+                    >
+                      🛒 Agregar al carrito
+                    </button>
 
                     <span className="receta-detail">Ver detalle</span>
                   </div>
