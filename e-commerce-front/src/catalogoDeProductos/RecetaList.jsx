@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useFavorite } from "../contexts/FavoriteContext";
 
 const homeCategories = [
   { title: "Saludables & Frescos", eyebrow: "Favoritos", className: "feature-large" },
@@ -12,6 +13,9 @@ const RecetaList = ({ variant = "catalog" }) => {
   const [recetas, setRecetas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // useContext (vía custom hook) para traer addToFavorite y esFavorito
+  const { addToFavorite, esFavorito } = useFavorite();
 
   useEffect(() => {
     const fetchRecetas = async () => {
@@ -68,6 +72,13 @@ const RecetaList = ({ variant = "catalog" }) => {
 
   const items = Array.isArray(recetas) ? recetas : [];
 
+  // Handler del corazón: evita la navegación del Link envolvente
+  const handleFavoriteClick = (e, receta) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToFavorite(receta);
+  };
+
   return (
     <section className="catalog-section">
       <div className="catalog-heading">
@@ -90,10 +101,31 @@ const RecetaList = ({ variant = "catalog" }) => {
             const desc = receta.descripcion ?? "Sin descripción";
             const price = receta.precio ?? 0;
             const categorias = receta.categorias ?? [];
+            const favorito = esFavorito(id);
 
             return (
               <Link to={`/recetas/${id}`} key={id || name} className="receta-link">
-                <article className="receta-card">
+                <article className="receta-card" style={{ position: "relative" }}>
+                  {/* Botón de favorito (corazón) - operador ternario para llenar/vaciar */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleFavoriteClick(e, receta)}
+                    aria-label={favorito ? "Quitar de favoritos" : "Agregar a favoritos"}
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "1.6rem",
+                      color: favorito ? "#e63946" : "#bbb",
+                      zIndex: 2,
+                    }}
+                  >
+                    {favorito ? "♥" : "♡"}
+                  </button>
+
                   <div className="receta-image" aria-hidden="true">
                     <span>{name.charAt(0).toUpperCase()}</span>
                   </div>

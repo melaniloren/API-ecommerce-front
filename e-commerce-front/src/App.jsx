@@ -4,10 +4,12 @@ import Hero from "./components/Hero";
 import RutaProtegida from "./routes/RutaProtegida";
 import RecetaList from "./catalogoDeProductos/RecetaList";
 import RecetaDetalle from "./catalogoDeProductos/RecetaDetalle";
+import Favorite from "./catalogoDeProductos/Favorite";
 import UserLogin from "./gestionDeUsuarios/UserLogin";
 import UserRegister from "./gestionDeUsuarios/UserRegister";
 import UserProfile from "./gestionDeUsuarios/UserProfile";
 import AdminRecetas from "./panelAdmin/AdminRecetas";
+import { FavoriteProvider } from "./contexts/FavoriteContext";
 import "./styles/App.css";
 
 function AppContent() {
@@ -26,6 +28,25 @@ function AppContent() {
           <Route path="/recetas/:id" element={<RecetaDetalle />} />
           <Route path="/login" element={<UserLogin />} />
           <Route path="/register" element={<UserRegister />} />
+
+          {/* RUTAS PROTEGIDAS para favoritos */}
+          <Route
+            path="/favoritos"
+            element={
+              <RutaProtegida>
+                <Favorite />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/favoritos/:id"
+            element={
+              <RutaProtegida>
+                <Favorite />
+              </RutaProtegida>
+            }
+          />
+
           <Route
             path="/perfil"
             element={
@@ -65,7 +86,9 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <FavoriteProvider>
+        <AppContent />
+      </FavoriteProvider>
     </BrowserRouter>
   );
 }

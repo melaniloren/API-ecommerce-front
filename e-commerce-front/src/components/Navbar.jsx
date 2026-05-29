@@ -85,6 +85,15 @@ function Navbar() {
             <>
               <li>
                 <Link
+                  to="/favoritos"
+                  className={isActive("/favoritos") ? "nav-link active" : "nav-link"}
+                  onClick={closeMenu}
+                >
+                  Favoritos
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/perfil"
                   className={isActive("/perfil") ? "nav-link active" : "nav-link"}
                   onClick={closeMenu}
