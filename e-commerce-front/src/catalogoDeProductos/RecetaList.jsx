@@ -1,10 +1,6 @@
-<<<<<<< Updated upstream
 // Importamos React y los hooks necesarios.
-import { useEffect, useState } from "react";
-// Importamos componentes de routing.
-=======
 import { useEffect, useMemo, useState } from "react";
->>>>>>> Stashed changes
+// Importamos componentes de routing.
 import { Link, useNavigate } from "react-router-dom";
 // Importamos nuestros custom hooks para acceder al contexto de favoritos y al carrito.
 import { useFavorite } from "../contexts/FavoriteContext";
@@ -19,38 +15,29 @@ const homeCategories = [
   { title: "Dulces", className: "feature-tall" },
 ];
 
-<<<<<<< Updated upstream
-// --- COMPONENTE CONSUMIDOR: LISTA DE RECETAS ---
-// Este componente es responsable de mostrar el catálogo y de permitir agregar
-// recetas a favoritos y al carrito usando los contextos correspondientes.
-const RecetaList = ({ variant = "catalog" }) => {
-  // Estado local: lista de recetas que vienen de la API.
-=======
+// Función auxiliar para obtener la categoría de la receta
 const getRecipeCategory = (receta) => receta.categorias?.[0]?.nombre ?? "Especial";
 
+// --- COMPONENTE CONSUMIDOR: LISTA DE RECETAS ---
+// Este componente es responsable de mostrar el catálogo, filtrar por categorías
+// y permitir agregar recetas a favoritos y al carrito.
 function RecetaList({ variant = "catalog" }) {
->>>>>>> Stashed changes
+  // Estado local para recetas, categorías y filtros
   const [recetas, setRecetas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [categoriaActiva, setCategoriaActiva] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-<<<<<<< Updated upstream
 
   // Usamos los custom hooks para obtener funciones de los contextos.
-  // Ya no necesitamos useContext directamente, queda más limpio.
   const { addToFavorite, esFavorito } = useFavorite();
   const { addToCart } = useCart();
-
+  
   // useNavigate para redirigir al login si el usuario no tiene sesión iniciada.
-=======
-  const { addToFavorite, esFavorito } = useFavorite();
-  const { addToCart } = useCart();
->>>>>>> Stashed changes
   const navigate = useNavigate();
   const logueado = !!localStorage.getItem("token");
 
-  // useEffect para cargar las recetas desde la API una sola vez al montar el componente.
+  // useEffect para cargar las recetas y categorías desde la API de forma simultánea
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -67,15 +54,10 @@ function RecetaList({ variant = "catalog" }) {
       }
     };
 
-<<<<<<< Updated upstream
-    fetchRecetas();
-  }, []); // El array vacío asegura que se ejecute solo al montar.
-
-  // Variante "home": muestra solo las categorías destacadas, no el catálogo entero.
-=======
     fetchData();
   }, []);
 
+  // useMemo para filtrar las recetas eficientemente según la categoría seleccionada
   const recipesToShow = useMemo(() => {
     if (categoriaActiva === "all") {
       return recetas;
@@ -88,7 +70,7 @@ function RecetaList({ variant = "catalog" }) {
     );
   }, [categoriaActiva, recetas]);
 
->>>>>>> Stashed changes
+  // Variante "home": muestra solo las categorías destacadas, no el catálogo entero.
   if (variant === "home") {
     return (
       <section className="home-inspiration">
@@ -123,18 +105,11 @@ function RecetaList({ variant = "catalog" }) {
     return <div className="catalog-state catalog-state-error">Error: {error}</div>;
   }
 
+  // Handler del corazón de favoritos (frena la navegación del Link y redirige si no está logueado)
   const handleFavoriteClick = (event, receta) => {
     event.preventDefault();
     event.stopPropagation();
 
-<<<<<<< Updated upstream
-  // Handler del corazón de favoritos.
-  // Frena la navegación del Link envolvente y, si no hay sesión, manda al login.
-  const handleFavoriteClick = (e, receta) => {
-    e.preventDefault();
-    e.stopPropagation();
-=======
->>>>>>> Stashed changes
     if (!logueado) {
       navigate("/login");
       return;
@@ -143,17 +118,11 @@ function RecetaList({ variant = "catalog" }) {
     addToFavorite(receta);
   };
 
-<<<<<<< Updated upstream
-  // Handler del botón "Agregar al carrito" (misma lógica que el corazón).
-  const handleCartClick = (e, receta) => {
-    e.preventDefault();
-    e.stopPropagation();
-=======
+  // Handler del botón "Agregar al carrito"
   const handleCartClick = (event, receta) => {
     event.preventDefault();
     event.stopPropagation();
 
->>>>>>> Stashed changes
     if (!logueado) {
       navigate("/login");
       return;
@@ -162,7 +131,7 @@ function RecetaList({ variant = "catalog" }) {
     addToCart(receta);
   };
 
-  // Renderizamos la lista de recetas.
+  // Renderizamos la lista de recetas con sus filtros.
   return (
     <section className="catalog-section">
       <div className="catalog-heading">
@@ -173,25 +142,7 @@ function RecetaList({ variant = "catalog" }) {
         <p>Explorá opciones caseras, simples y listas para sumar a tu mesa.</p>
       </div>
 
-<<<<<<< Updated upstream
-      {items.length === 0 ? (
-        <div className="catalog-empty">No hay recetas disponibles en este momento.</div>
-      ) : (
-        <div className="receta-grid">
-          {items.map((receta) => {
-            const id = receta.id;
-            const name = receta.nombre ?? "Sin nombre";
-            const desc = receta.descripcion ?? "Sin descripción";
-            const price = receta.precio ?? 0;
-            const categorias = receta.categorias ?? [];
-            // Operador ternario: si no hay sesión, el corazón siempre va vacío.
-            const favorito = logueado ? esFavorito(id) : false;
-
-            return (
-              <Link to={`/recetas/${id}`} key={id || name} className="receta-link">
-                <article className="receta-card" style={{ position: "relative" }}>
-                  {/* Botón del corazón (favoritos) */}
-=======
+      {/* Botones de Filtros */}
       <div className="catalog-filters">
         <button
           className={categoriaActiva === "all" ? "catalog-filter active" : "catalog-filter"}
@@ -212,6 +163,7 @@ function RecetaList({ variant = "catalog" }) {
         ))}
       </div>
 
+      {/* Grid de Recetas Filtradas */}
       {recipesToShow.length === 0 ? (
         <div className="catalog-empty">
           No hay recetas disponibles para la categoria seleccionada.
@@ -223,8 +175,8 @@ function RecetaList({ variant = "catalog" }) {
 
             return (
               <Link to={`/recetas/${receta.id}`} key={receta.id} className="receta-link">
-                <article className="receta-card receta-card-actions">
->>>>>>> Stashed changes
+                <article className="receta-card receta-card-actions" style={{ position: "relative" }}>
+                  {/* Botón del corazón (favoritos) */}
                   <button
                     className={favorito ? "favorite-toggle active" : "favorite-toggle"}
                     type="button"
