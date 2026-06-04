@@ -1,66 +1,61 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  loadRecetaById,
+  loadRecipeDetailsByRecipe,
+  loadRecetas,
+} from "../utils/catalogStore";
 
 const getInitial = (nombre = "") => nombre.trim().charAt(0).toUpperCase() || "R";
-
-const getCategoryName = (categorias = []) =>
-  categorias.length > 0 ? categorias[0].nombre : "Especial";
-
-const getPreparationTime = (descripcion = "") => {
-  if (descripcion.length > 60) return "35 min";
-  if (descripcion.length > 30) return "25 min";
-  return "18 min";
-};
-
-const getIntensityLabel = (precio = 0) => {
-  if (precio >= 9000) return "Contundente";
-  if (precio >= 7500) return "Equilibrada";
-  return "Liviana";
-};
+const getCategoryName = (categorias = []) => categorias[0]?.nombre ?? "Especial";
 
 function RecetaDetalle() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [receta, setReceta] = useState(null);
   const [relacionadas, setRelacionadas] = useState([]);
+  const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchReceta = async () => {
+    const fetchData = async () => {
       setCargando(true);
       setError(null);
 
       try {
-        const [detalleResponse, recetasResponse] = await Promise.all([
-          fetch(`http://localhost:8080/api/recetas/${id}`),
-          fetch("http://localhost:8080/api/recetas"),
+        const [recipe, allRecipes, recipeDetails] = await Promise.all([
+          loadRecetaById(id),
+          loadRecetas(),
+          loadRecipeDetailsByRecipe(id),
         ]);
 
-        if (!detalleResponse.ok) {
+        if (!recipe) {
           throw new Error("Receta no encontrada");
         }
 
-        if (!recetasResponse.ok) {
-          throw new Error("No se pudieron cargar recetas relacionadas");
-        }
-
-        const detalleData = await detalleResponse.json();
-        const recetasData = await recetasResponse.json();
-
-        const categoriaPrincipal = getCategoryName(detalleData.categorias ?? []);
-        const sugeridas = (Array.isArray(recetasData) ? recetasData : [])
-          .filter((item) => item.id !== detalleData.id)
+        const categoriaPrincipal = getCategoryName(recipe.categorias ?? []);
+        const sugeridas = allRecipes
+          .filter((item) => String(item.id) !== String(recipe.id))
           .sort((a, b) => {
-            const aCategoria = getCategoryName(a.categorias ?? []);
-            const bCategoria = getCategoryName(b.categorias ?? []);
-
-            return Number(bCategoria === categoriaPrincipal) - Number(aCategoria === categoriaPrincipal);
+            const matchA = getCategoryName(a.categorias ?? []) === categoriaPrincipal ? 1 : 0;
+            const matchB = getCategoryName(b.categorias ?? []) === categoriaPrincipal ? 1 : 0;
+            return matchB - matchA;
           })
           .slice(0, 3);
 
-        setReceta(detalleData);
+        setReceta(recipe);
         setRelacionadas(sugeridas);
+        setProductos(
+          recipeDetails.map((detail) => ({
+            id: detail.ingredienteId,
+            nombre: detail.ingredienteNombre,
+            descripcion: detail.ingredienteDescripcion,
+            stock: detail.ingredienteStock,
+            cantidad: detail.cantidad,
+            unidad: detail.unidad,
+          })),
+        );
       } catch (err) {
         setError(err.message);
       } finally {
@@ -68,7 +63,7 @@ function RecetaDetalle() {
       }
     };
 
-    fetchReceta();
+    fetchData();
   }, [id]);
 
   if (cargando) {
@@ -78,18 +73,10 @@ function RecetaDetalle() {
   if (error || !receta) {
     return (
       <div className="catalog-state catalog-state-error">
-        Error: {error ?? "No se encontró la receta."}
+        Error: {error ?? "No se encontro la receta."}
       </div>
     );
   }
-
-  const nombre = receta.nombre ?? "Receta sin nombre";
-  const descripcion = receta.descripcion ?? "Todavía no hay una descripción disponible.";
-  const precio = Number(receta.precio ?? 0);
-  const categorias = receta.categorias ?? [];
-  const categoriaPrincipal = getCategoryName(categorias);
-  const tiempo = getPreparationTime(descripcion);
-  const intensidad = getIntensityLabel(precio);
 
   return (
     <section className="recipe-detail-page">
@@ -101,36 +88,36 @@ function RecetaDetalle() {
 
           <p className="section-kicker">Detalle de receta</p>
           <div className="recipe-detail-tags">
-            <span>{categoriaPrincipal}</span>
-            <span>{tiempo}</span>
-            <span>{intensidad}</span>
+            <span>{getCategoryName(receta.categorias ?? [])}</span>
+            <span>${Number(receta.precio ?? 0).toLocaleString("es-AR")}</span>
+            <span>{productos.length} productos</span>
           </div>
-          <h1>{nombre}</h1>
-          <p className="recipe-detail-description">{descripcion}</p>
+          <h1>{receta.nombre}</h1>
+          <p className="recipe-detail-description">{receta.descripcion}</p>
 
           <div className="recipe-detail-stats">
             <div>
-              <strong>${precio.toLocaleString("es-AR")}</strong>
+              <strong>${Number(receta.precio ?? 0).toLocaleString("es-AR")}</strong>
               <span>Precio final</span>
             </div>
             <div>
-              <strong>{tiempo}</strong>
-              <span>Preparación estimada</span>
+              <strong>{(receta.categorias ?? []).length || 1}</strong>
+              <span>Categorias</span>
             </div>
             <div>
-              <strong>{categorias.length || 1}</strong>
-              <span>Categoría destacada</span>
+              <strong>{productos.length}</strong>
+              <span>Productos vinculados</span>
             </div>
           </div>
         </div>
 
         <div className="recipe-detail-visual" aria-hidden="true">
           <div className="recipe-detail-art">
-            <div className="recipe-detail-art-letter">{getInitial(nombre)}</div>
+            <div className="recipe-detail-art-letter">{getInitial(receta.nombre)}</div>
           </div>
           <div className="recipe-detail-note">
-            <strong>Una receta para repetir</strong>
-            <span>Ideal para resolver una comida rica sin demasiadas vueltas.</span>
+            <strong>Armado de la receta</strong>
+            <span>Los productos mostrados abajo salen de la relacion guardada en backend.</span>
           </div>
         </div>
       </div>
@@ -138,63 +125,55 @@ function RecetaDetalle() {
       <div className="recipe-detail-grid">
         <div className="recipe-detail-main">
           <article className="recipe-detail-card">
-            <p className="section-kicker">Sobre esta receta</p>
-            <h2>Qué vas a encontrar</h2>
-            <p>
-              {nombre} combina una propuesta simple con una presentación clara para
-              que puedas decidir rápido y sumar una opción rica a tu próxima comida.
-            </p>
-
-            <div className="recipe-detail-bullets">
-              <div>
-                <strong>Sabor protagonista</strong>
-                <span>{categoriaPrincipal}</span>
-              </div>
-              <div>
-                <strong>Perfil</strong>
-                <span>{intensidad}</span>
-              </div>
-              <div>
-                <strong>Momento ideal</strong>
-                <span>Almuerzo o cena casera</span>
-              </div>
-            </div>
+            <p className="section-kicker">Descripcion</p>
+            <h2>Una receta para sumar al catalogo</h2>
+            <p>{receta.descripcion}</p>
           </article>
 
           <article className="recipe-detail-card">
-            <p className="section-kicker">Descripción completa</p>
-            <h2>Una opción rica y fácil de elegir</h2>
-            <p>{descripcion}</p>
-            <p>
-              El catálogo está pensado para que cada receta sea rápida de ubicar,
-              con precio claro y una experiencia más prolija al momento de comparar.
-            </p>
+            <div className="recipe-products-header">
+              <div>
+                <p className="section-kicker">Productos de la receta</p>
+                <h2>Ingredientes o productos asociados</h2>
+              </div>
+              <p>Esta seccion se alimenta desde receta-detalles con los vinculos reales.</p>
+            </div>
+
+            {productos.length === 0 ? (
+              <div className="catalog-empty">Todavia no hay productos vinculados a esta receta.</div>
+            ) : (
+              <div className="recipe-product-grid">
+                {productos.map((producto) => (
+                  <article className="recipe-product-card" key={`${producto.id}-${producto.nombre}`}>
+                    <div className="recipe-product-card-top">
+                      <strong>{producto.nombre}</strong>
+                      <span>
+                        {producto.cantidad} {producto.unidad}
+                      </span>
+                    </div>
+                    <p>{producto.descripcion || "Sin descripcion."}</p>
+                    {producto.stock !== undefined && (
+                      <small>Stock disponible: {producto.stock}</small>
+                    )}
+                  </article>
+                ))}
+              </div>
+            )}
           </article>
         </div>
 
         <aside className="recipe-detail-sidebar">
           <article className="recipe-detail-card recipe-detail-summary">
             <p className="section-kicker">Resumen</p>
-            <h2>Lista para tu próxima elección</h2>
-            <div className="recipe-detail-price">${precio.toLocaleString("es-AR")}</div>
+            <h2>Vista rapida</h2>
+            <div className="recipe-detail-price">
+              ${Number(receta.precio ?? 0).toLocaleString("es-AR")}
+            </div>
             <div className="recipe-detail-category-list">
-              {categorias.map((cat) => (
-                <span key={cat.idCategoria}>{cat.nombre}</span>
+              {(receta.categorias ?? []).map((categoria) => (
+                <span key={categoria.idCategoria}>{categoria.nombre}</span>
               ))}
-              {categorias.length === 0 && <span>Especial del día</span>}
             </div>
-
-            <div className="recipe-detail-checklist">
-              <div>
-                <strong>Ideal para</strong>
-                <span>Resolver una comida casera sin perder tiempo.</span>
-              </div>
-              <div>
-                <strong>Estilo</strong>
-                <span>{intensidad} y fácil de elegir dentro del catálogo.</span>
-              </div>
-            </div>
-
             <Link to="/catalogo" className="recipe-detail-cta">
               Seguir explorando
             </Link>
@@ -206,25 +185,21 @@ function RecetaDetalle() {
         <section className="recipe-related-section">
           <div className="catalog-heading recipe-related-heading">
             <div>
-              <p className="section-kicker">También te puede gustar</p>
-              <h2>Más recetas para mirar</h2>
+              <p className="section-kicker">Tambien te puede gustar</p>
+              <h2>Mas recetas para mirar</h2>
             </div>
-            <p>Opciones cercanas en estilo y precio para seguir explorando.</p>
+            <p>Opciones cercanas en estilo y categoria para seguir navegando.</p>
           </div>
 
           <div className="receta-grid">
             {relacionadas.map((item) => (
-              <Link
-                to={`/recetas/${item.id}`}
-                key={item.id}
-                className="receta-link"
-              >
+              <Link to={`/recetas/${item.id}`} key={item.id} className="receta-link">
                 <article className="receta-card">
                   <div className="receta-image" aria-hidden="true">
                     <span>{getInitial(item.nombre ?? "")}</span>
                   </div>
                   <div className="receta-card-body">
-                    <h3>{item.nombre ?? "Receta"}</h3>
+                    <h3>{item.nombre}</h3>
                     <div className="receta-tags">
                       <span>{getCategoryName(item.categorias ?? [])}</span>
                     </div>
@@ -232,9 +207,9 @@ function RecetaDetalle() {
                       ${Number(item.precio ?? 0).toLocaleString("es-AR")}
                     </p>
                     <p className="receta-desc">
-                      {(item.descripcion ?? "Sin descripción").length > 88
+                      {(item.descripcion ?? "Sin descripcion").length > 88
                         ? `${item.descripcion.substring(0, 88)}...`
-                        : item.descripcion ?? "Sin descripción"}
+                        : item.descripcion ?? "Sin descripcion"}
                     </p>
                     <span className="receta-detail">Ver detalle</span>
                   </div>

@@ -1,241 +1,273 @@
-import React, { useEffect, useState } from 'react';
-import CrearReceta from './CrearReceta';
-import fetchConAuth from '../utils/fetchConAuth';
+import { useEffect, useState } from "react";
+import CrearReceta from "./CrearReceta";
+import AdminProductos from "./AdminProductos";
+import AdminCategorias from "./AdminCategorias";
+import fetchConAuth from "../utils/fetchConAuth";
+import {
+  deleteCategoryApi,
+  deleteIngredient,
+  loadCategories,
+  loadIngredients,
+  loadRecipeProductMap,
+  loadRecetas,
+  replaceRecipeProducts,
+  saveCategoryApi,
+  saveIngredient,
+} from "../utils/catalogStore";
 
-const AdminRecetas = () => {
+const tabs = [
+  { id: "recetas", label: "Recetas" },
+  { id: "productos", label: "Productos" },
+  { id: "categorias", label: "Categorias" },
+];
+
+function AdminRecetas() {
+  const [activeTab, setActiveTab] = useState("recetas");
   const [recetas, setRecetas] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [productos, setProductos] = useState([]);
+  const [productosPorReceta, setProductosPorReceta] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Control del popup
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [recetaEditando, setRecetaEditando] = useState(null);
 
-  useEffect(() => {
-    fetchRecetas();
-  }, []);
+  const reloadData = async () => {
+    setLoading(true);
+    setError(null);
 
-  const fetchRecetas = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/recetas');
+      const [recipesData, categoriesData, productsData, recipeProductMap] = await Promise.all([
+        loadRecetas(),
+        loadCategories(),
+        loadIngredients(),
+        loadRecipeProductMap(),
+      ]);
 
-      if (!response.ok) {
-        throw new Error('Error al cargar recetas');
-      }
-
-      const data = await response.json();
-      setRecetas(data);
-
+      setRecetas(recipesData);
+      setCategorias(categoriesData);
+      setProductos(productsData);
+      setProductosPorReceta(recipeProductMap);
     } catch (err) {
       setError(err.message);
-
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta receta?')) {
-      return;
-    }
+  useEffect(() => {
+    reloadData();
+  }, []);
+
+  const handleDeleteReceta = async (id) => {
+    if (!window.confirm("Estas seguro de eliminar esta receta?")) return;
 
     try {
       const response = await fetchConAuth(`http://localhost:8080/api/recetas/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error('No se pudo eliminar la receta');
+        throw new Error("No se pudo eliminar la receta");
       }
 
-      setRecetas(recetas.filter(r => r.id !== id));
-
-      alert('Receta eliminada con éxito');
-
+      await reloadData();
     } catch (err) {
       alert(err.message);
     }
   };
 
-  const abrirCrear = () => {
+  const handleSaveRecipeProducts = async (recipeId, productIds) => {
+    await replaceRecipeProducts(recipeId, productIds, fetchConAuth);
+  };
+
+  const handleSaveProduct = async (productData) => {
+    try {
+      await saveIngredient(productData, fetchConAuth);
+      await reloadData();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    if (!window.confirm("Estas seguro de eliminar este producto?")) return;
+
+    try {
+      await deleteIngredient(productId, fetchConAuth);
+      await reloadData();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleSaveCategory = async (categoryData) => {
+    try {
+      await saveCategoryApi(categoryData, fetchConAuth);
+      await reloadData();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId) => {
+    if (!window.confirm("Estas seguro de eliminar esta categoria?")) return;
+
+    try {
+      await deleteCategoryApi(categoryId, fetchConAuth);
+      await reloadData();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const openCreate = () => {
     setRecetaEditando(null);
     setMostrarFormulario(true);
   };
 
-  const abrirEditar = (receta) => {
+  const openEdit = (receta) => {
     setRecetaEditando(receta);
     setMostrarFormulario(true);
   };
 
-  const cerrarFormulario = () => {
+  const closeForm = () => {
     setMostrarFormulario(false);
     setRecetaEditando(null);
   };
 
   if (loading) {
-    return <div style={{ padding: '2rem' }}>Cargando panel...</div>;
+    return <div className="catalog-state">Cargando panel...</div>;
   }
 
   if (error) {
-    return (
-      <div style={{ padding: '2rem', color: 'red' }}>
-        Error: {error}
-      </div>
-    );
+    return <div className="catalog-state catalog-state-error">Error: {error}</div>;
   }
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
+    <section className="admin-page">
+      <div className="admin-header">
+        <div>
+          <p className="section-kicker">Panel de gestion</p>
+          <h1>Administracion del catalogo</h1>
+        </div>
+        <p>Gestiona recetas, productos y categorias desde un solo lugar.</p>
+      </div>
 
-      <h1>Gestión de Recetas</h1>
+      <div className="admin-tabs" role="tablist" aria-label="Secciones del panel">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            className={activeTab === tab.id ? "admin-tab active" : "admin-tab"}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-      <button
-        onClick={abrirCrear}
-        style={{
-          marginBottom: '1rem',
-          padding: '10px 16px',
-          backgroundColor: '#28a745',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          fontWeight: 'bold'
-        }}
-      >
-        + Nueva Receta
-      </button>
+      {activeTab === "recetas" && (
+        <div className="admin-section-grid">
+          <article className="admin-card admin-card-wide">
+            <div className="admin-card-heading">
+              <div>
+                <p className="section-kicker">Recetas activas</p>
+                <h2>Administrar recetas</h2>
+              </div>
+              <button className="admin-primary-button" type="button" onClick={openCreate}>
+                Nueva receta
+              </button>
+            </div>
 
-      {/* MODAL */}
+            {recetas.length === 0 ? (
+              <div className="catalog-empty">No hay recetas registradas.</div>
+            ) : (
+              <div className="admin-stack">
+                {recetas.map((receta) => {
+                  const productosAsociados = productosPorReceta[String(receta.id)] ?? [];
+
+                  return (
+                    <article className="admin-item-card" key={receta.id}>
+                      <div className="admin-item-main">
+                        <div className="admin-item-meta">
+                          {(receta.categorias ?? []).map((categoria) => (
+                            <span key={categoria.idCategoria}>{categoria.nombre}</span>
+                          ))}
+                        </div>
+                        <h3>{receta.nombre}</h3>
+                        <p>{receta.descripcion}</p>
+                        <strong>${Number(receta.precio ?? 0).toLocaleString("es-AR")}</strong>
+                        <div className="admin-associated-list">
+                          {productosAsociados.length > 0 ? (
+                            productosAsociados.map((product) => (
+                              <span key={`${receta.id}-${product.id}`}>{product.nombre}</span>
+                            ))
+                          ) : (
+                            <span>Sin productos asociados</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="admin-inline-actions">
+                        <button type="button" onClick={() => openEdit(receta)}>
+                          Editar
+                        </button>
+                        <button type="button" onClick={() => handleDeleteReceta(receta.id)}>
+                          Eliminar
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </article>
+        </div>
+      )}
+
+      {activeTab === "productos" && (
+        <AdminProductos
+          products={productos}
+          onDeleteProduct={handleDeleteProduct}
+          onSaveProduct={handleSaveProduct}
+        />
+      )}
+
+      {activeTab === "categorias" && (
+        <AdminCategorias
+          categories={categorias}
+          onDeleteCategory={handleDeleteCategory}
+          onSaveCategory={handleSaveCategory}
+        />
+      )}
+
       {mostrarFormulario && (
-        <div
-          onClick={cerrarFormulario}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'rgba(0,0,0,0.35)',
-            backdropFilter: 'blur(5px)',
-            WebkitBackdropFilter: 'blur(5px)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 999
-          }}
-        >
-          {/* Evita que se cierre al hacer click dentro */}
-          <div onClick={(e) => e.stopPropagation()}>
+        <div className="admin-modal-overlay" onClick={closeForm}>
+          <div onClick={(event) => event.stopPropagation()}>
             <CrearReceta
               recetaEditar={recetaEditando}
-              onRecetaCreada={() => {
-                fetchRecetas();
-                cerrarFormulario();
+              categories={categorias}
+              products={productos}
+              initialProductIds={
+                recetaEditando
+                  ? (productosPorReceta[String(recetaEditando.id)] ?? []).map((item) =>
+                      String(item.id),
+                    )
+                  : []
+              }
+              onSaveRecipeProducts={handleSaveRecipeProducts}
+              onRecetaCreada={async () => {
+                await reloadData();
+                closeForm();
               }}
-              onCancelar={cerrarFormulario}
+              onCancelar={closeForm}
             />
           </div>
         </div>
       )}
-
-      {/* TABLA */}
-      <table
-        style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          marginTop: '1rem'
-        }}
-      >
-        <thead>
-          <tr
-            style={{
-              backgroundColor: '#f8f9fa',
-              borderBottom: '2px solid #dee2e6'
-            }}
-          >
-            <th style={{ padding: '1rem', textAlign: 'left' }}>
-              Nombre
-            </th>
-
-            <th style={{ padding: '1rem', textAlign: 'left' }}>
-              Precio
-            </th>
-
-            <th style={{ padding: '1rem', textAlign: 'center' }}>
-              Acciones
-            </th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {recetas.length === 0 ? (
-            <tr>
-              <td
-                colSpan="3"
-                style={{
-                  padding: '1rem',
-                  textAlign: 'center',
-                  color: '#6c757d'
-                }}
-              >
-                No hay recetas registradas.
-              </td>
-            </tr>
-          ) : (
-            recetas.map((receta) => (
-              <tr
-                key={receta.id}
-                style={{
-                  borderBottom: '1px solid #dee2e6'
-                }}
-              >
-                <td style={{ padding: '1rem' }}>
-                  {receta.nombre}
-                </td>
-
-                <td style={{ padding: '1rem' }}>
-                  ${receta.precio}
-                </td>
-
-                <td
-                  style={{
-                    padding: '1rem',
-                    textAlign: 'center'
-                  }}
-                >
-                  <button
-                    onClick={() => abrirEditar(receta)}
-                    style={{
-                      marginRight: '0.5rem',
-                      color: '#007bff',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Editar
-                  </button>
-
-                  <button
-                    onClick={() => handleDelete(receta.id)}
-                    style={{
-                      color: '#dc3545',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-
-    </div>
+    </section>
   );
-};
+}
 
 export default AdminRecetas;

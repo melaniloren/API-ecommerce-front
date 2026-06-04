@@ -1,283 +1,193 @@
-import React, { useState, useEffect } from 'react';
-import fetchConAuth from '../utils/fetchConAuth';
+import { useEffect, useState } from "react";
+import fetchConAuth from "../utils/fetchConAuth";
 
-const CrearReceta = ({ onRecetaCreada, onCancelar, recetaEditar }) => {
+const buildInitialForm = (recetaEditar) => ({
+  nombre: recetaEditar?.nombre ?? "",
+  descripcion: recetaEditar?.descripcion ?? "",
+  precio: recetaEditar?.precio ?? "",
+  categoriaId: recetaEditar?.categorias?.[0]?.idCategoria ?? "",
+});
 
-  const esEdicion = !!recetaEditar;
-
-  const [formData, setFormData] = useState({
-    nombre: recetaEditar?.nombre ?? '',
-    descripcion: recetaEditar?.descripcion ?? '',
-    precio: recetaEditar?.precio ?? '',
-    categoriaId: recetaEditar?.categorias?.[0]?.idCategoria ?? ''
-  });
-
-  const [categorias, setCategorias] = useState([]);
+function CrearReceta({
+  onRecetaCreada,
+  onCancelar,
+  recetaEditar,
+  categories,
+  products,
+  initialProductIds = [],
+  onSaveRecipeProducts,
+}) {
+  const esEdicion = Boolean(recetaEditar);
+  const [formData, setFormData] = useState(buildInitialForm(recetaEditar));
+  const [selectedProductIds, setSelectedProductIds] = useState(initialProductIds);
   const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
-    fetchCategorias();
-  }, []);
+    setFormData(buildInitialForm(recetaEditar));
+    setSelectedProductIds(initialProductIds);
+  }, [initialProductIds, recetaEditar]);
 
-  const fetchCategorias = async () => {
-    try {
-
-      const response = await fetch(
-        'http://localhost:8080/api/categorias'
-      );
-
-      if (!response.ok) {
-        throw new Error('Error cargando categorías');
-      }
-
-      const data = await response.json();
-
-      console.log('Categorias:', data);
-
-      setCategorias(data);
-
-    } catch (err) {
-      console.error(err);
-    }
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleChange = (e) => {
-
-    const { name, value } = e.target;
-
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const toggleProduct = (productId) => {
+    setSelectedProductIds((prev) =>
+      prev.includes(String(productId))
+        ? prev.filter((id) => id !== String(productId))
+        : [...prev, String(productId)],
+    );
   };
 
-  const handleSubmit = async (e) => {
-
-    e.preventDefault();
-
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setCargando(true);
 
     try {
-
-      // IMPORTANTE:
-      // Ajustado para Spring Boot
-
       const payload = {
         nombre: formData.nombre,
         descripcion: formData.descripcion,
         precio: parseFloat(formData.precio),
-        categorias: [parseInt(formData.categoriaId)]
+        categorias: formData.categoriaId ? [parseInt(formData.categoriaId, 10)] : [],
       };
 
-      console.log('Payload enviado:', payload);
-
-      const url = esEdicion
-        ? `http://localhost:8080/api/recetas/${recetaEditar.id}`
-        : 'http://localhost:8080/api/recetas';
-
       const response = await fetchConAuth(
-        url,
+        esEdicion
+          ? `http://localhost:8080/api/recetas/${recetaEditar.id}`
+          : "http://localhost:8080/api/recetas",
         {
-          method: esEdicion ? 'PUT' : 'POST',
-          body: JSON.stringify(payload)
-        }
+          method: esEdicion ? "PUT" : "POST",
+          body: JSON.stringify(payload),
+        },
       );
 
       if (!response.ok) {
-
-        const errorText = await response.text();
-
-        console.error(errorText);
-
-        throw new Error(
-          esEdicion ? 'Error al actualizar receta' : 'Error al crear receta'
-        );
+        throw new Error(esEdicion ? "Error al actualizar receta" : "Error al crear receta");
       }
 
-      const nuevaReceta = await response.json();
+      const savedRecipe = await response.json();
 
-      console.log(esEdicion ? 'Receta actualizada:' : 'Receta creada:', nuevaReceta);
-
-      alert(esEdicion ? 'Receta actualizada correctamente' : 'Receta creada correctamente');
-
-      setFormData({
-        nombre: '',
-        descripcion: '',
-        precio: '',
-        categoriaId: ''
-      });
-
-      if (onRecetaCreada) {
-        onRecetaCreada(nuevaReceta);
+      if (onSaveRecipeProducts) {
+        await onSaveRecipeProducts(savedRecipe.id, selectedProductIds);
       }
 
-    } catch (err) {
-
-      console.error(err);
-
-      alert(err.message);
-
+      onRecetaCreada?.(savedRecipe);
+      setFormData(buildInitialForm(null));
+      setSelectedProductIds([]);
+    } catch (error) {
+      alert(error.message);
     } finally {
-
       setCargando(false);
     }
   };
 
   return (
-
-    <div
-      style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        padding: '24px',
-        width: '450px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-      }}
-    >
-
-      <h2 style={{ marginTop: 0 }}>
-        {esEdicion ? 'Editar Receta' : 'Nueva Receta'}
-      </h2>
-
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px'
-        }}
-      >
-
+    <div className="admin-modal-card">
+      <div className="admin-card-heading">
         <div>
-          <label>Nombre</label>
+          <p className="section-kicker">{esEdicion ? "Editar receta" : "Nueva receta"}</p>
+          <h2>{esEdicion ? "Actualizar receta" : "Agregar receta"}</h2>
+        </div>
+        <p>Completa los datos basicos y elegi los productos que la componen.</p>
+      </div>
 
+      <form className="admin-form" onSubmit={handleSubmit}>
+        <label>
+          Nombre
           <input
             type="text"
             name="nombre"
             value={formData.nombre}
             onChange={handleChange}
             required
-            style={inputStyle}
           />
-        </div>
+        </label>
 
-        <div>
-          <label>Descripción</label>
-
+        <label>
+          Descripcion
           <textarea
             name="descripcion"
             value={formData.descripcion}
             onChange={handleChange}
-            style={{
-              ...inputStyle,
-              height: '90px',
-              resize: 'vertical'
-            }}
-          />
-        </div>
-
-        <div>
-          <label>Precio</label>
-
-          <input
-            type="number"
-            name="precio"
-            value={formData.precio}
-            onChange={handleChange}
             required
-            min="0"
-            step="0.01"
-            style={inputStyle}
           />
+        </label>
+
+        <div className="admin-form-grid">
+          <label>
+            Precio
+            <input
+              type="number"
+              name="precio"
+              value={formData.precio}
+              onChange={handleChange}
+              min="0"
+              step="0.01"
+              required
+            />
+          </label>
+
+          <label>
+            Categoria
+            <select
+              name="categoriaId"
+              value={formData.categoriaId}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Seleccionar categoria</option>
+              {categories.map((category) => (
+                <option key={category.idCategoria} value={category.idCategoria}>
+                  {category.nombre}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
-        <div>
-          <label>Categoría</label>
+        <div className="admin-products-picker">
+          <div className="admin-products-picker-heading">
+            <strong>Productos vinculados</strong>
+            <span>{selectedProductIds.length} seleccionados</span>
+          </div>
 
-          <select
-            name="categoriaId"
-            value={formData.categoriaId}
-            onChange={handleChange}
-            required
-            style={inputStyle}
-          >
+          {products.length === 0 ? (
+            <div className="catalog-empty">
+              Primero carga productos en el panel para poder asociarlos a la receta.
+            </div>
+          ) : (
+            <div className="admin-chip-grid">
+              {products.map((product) => {
+                const active = selectedProductIds.includes(String(product.id));
 
-            <option value="">
-              Seleccionar categoría
-            </option>
-
-            {categorias.map((cat) => (
-
-              <option
-                key={cat.idCategoria}
-                value={cat.idCategoria}
-              >
-                {cat.nombre}
-              </option>
-
-            ))}
-
-          </select>
+                return (
+                  <button
+                    className={active ? "admin-chip active" : "admin-chip"}
+                    key={product.id}
+                    type="button"
+                    onClick={() => toggleProduct(product.id)}
+                  >
+                    <span>{product.nombre}</span>
+                    {product.stock !== undefined && <small>Stock: {product.stock}</small>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            gap: '10px',
-            marginTop: '10px'
-          }}
-        >
-
-          <button
-            type="submit"
-            disabled={cargando}
-            style={{
-              flex: 1,
-              padding: '12px',
-              border: 'none',
-              borderRadius: '8px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
-          >
-            {cargando
-              ? 'Guardando...'
-              : 'Guardar'}
+        <div className="admin-form-actions">
+          <button className="admin-primary-button" type="submit" disabled={cargando}>
+            {cargando ? "Guardando..." : esEdicion ? "Guardar cambios" : "Crear receta"}
           </button>
-
-          <button
-            type="button"
-            onClick={onCancelar}
-            style={{
-              flex: 1,
-              padding: '12px',
-              border: 'none',
-              borderRadius: '8px',
-              backgroundColor: '#6c757d',
-              color: 'white',
-              cursor: 'pointer'
-            }}
-          >
+          <button className="admin-secondary-button" type="button" onClick={onCancelar}>
             Cancelar
           </button>
-
         </div>
-
       </form>
-
     </div>
   );
-};
-
-const inputStyle = {
-  width: '100%',
-  padding: '10px',
-  marginTop: '4px',
-  borderRadius: '6px',
-  border: '1px solid #ccc',
-  boxSizing: 'border-box'
-};
+}
 
 export default CrearReceta;
