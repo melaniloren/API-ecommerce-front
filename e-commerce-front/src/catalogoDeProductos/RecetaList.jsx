@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 // Importamos nuestros custom hooks para acceder al store de favoritos y al carrito.
 import { useFavorite } from "../store/hooks/useFavorite";
-import { useCart } from "../contexts/CartContext";
+import { useCart } from "../store/hooks/useCart";
 import { loadCategories, loadRecetas } from "../utils/catalogStore";
 
 // Categorías hardcodeadas que se muestran solo en la vista "home".

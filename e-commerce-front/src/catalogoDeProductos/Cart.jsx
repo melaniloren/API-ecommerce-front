@@ -1,7 +1,7 @@
 // Importamos componentes de routing.
 import { Link, useNavigate } from "react-router-dom";
-// Importamos nuestro custom hook para acceder al contexto del carrito.
-import { useCart } from "../contexts/CartContext";
+// Importamos nuestro custom hook para acceder al store del carrito.
+import { useCart } from "../store/hooks/useCart";
 
 // --- COMPONENTE CONSUMIDOR: PÁGINA DEL CARRITO ---
 // Este componente muestra los productos agregados al carrito, permite modificar

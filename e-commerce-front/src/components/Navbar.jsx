@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { esAdmin } from "../utils/auth";
-import { useCart } from "../contexts/CartContext";
+import { useCart } from "../store/hooks/useCart";
 import "../styles/Navbar.css";
 
 function Navbar() {
