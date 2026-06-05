@@ -1,7 +1,7 @@
 // Importamos componentes de routing.
 import { Link, useNavigate, useParams } from "react-router-dom";
-// Importamos nuestro custom hook para acceder al contexto de favoritos.
-import { useFavorite } from "../contexts/FavoriteContext";
+// Importamos nuestro custom hook para acceder al store de favoritos.
+import { useFavorite } from "../store/hooks/useFavorite";
 
 // --- COMPONENTE CONSUMIDOR: LISTADO DE FAVORITOS ---
 // Este componente es responsable de mostrar las recetas que el usuario marcó como favoritas.

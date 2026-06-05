@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 // Importamos componentes de routing.
 import { Link, useNavigate } from "react-router-dom";
-// Importamos nuestros custom hooks para acceder al contexto de favoritos y al carrito.
-import { useFavorite } from "../contexts/FavoriteContext";
+// Importamos nuestros custom hooks para acceder al store de favoritos y al carrito.
+import { useFavorite } from "../store/hooks/useFavorite";
 import { useCart } from "../contexts/CartContext";
 import { loadCategories, loadRecetas } from "../utils/catalogStore";
 
