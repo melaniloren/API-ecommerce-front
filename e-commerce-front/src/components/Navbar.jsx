@@ -105,6 +105,15 @@ function Navbar() {
               </li>
               <li>
                 <Link
+                  to="/mis-compras"
+                  className={isActive("/mis-compras") ? "nav-link active" : "nav-link"}
+                  onClick={closeMenu}
+                >
+                  Mis compras
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/perfil"
                   className={isActive("/perfil") ? "nav-link active" : "nav-link"}
                   onClick={closeMenu}

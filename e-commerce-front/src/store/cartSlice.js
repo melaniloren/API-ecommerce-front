@@ -1,35 +1,261 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import fetchConAuth from "../utils/fetchConAuth";
+
+const API_BASE = "http://localhost:8080/api";
+
+// --- Helpers ---------------------------------------------------------------
+
+// Mapea un CarritoDetalleDTO del backend al shape que usa el front.
+const mapDetalle = (detalle) => ({
+  id: detalle.id,
+  recetaId: detalle.recetaId,
+  nombre: detalle.recetaNombre,
+  precio: detalle.recetaPrecio,
+  cantidad: detalle.cantidad,
+  subtotal: detalle.precioTotal,
+});
+
+// Mapea un CarritoDTO completo al shape del state.
+const mapCarrito = (carrito) => ({
+  cartId: carrito.id,
+  cartItems: (carrito.detalles ?? []).map(mapDetalle),
+  precioTotal: carrito.precioTotal ?? 0,
+});
+
+// Obtiene el usuarioId desde GET /api/usuarios/perfil.
+const fetchUsuarioId = async () => {
+  const response = await fetchConAuth(`${API_BASE}/usuarios/perfil`);
+  if (!response.ok) {
+    throw new Error("No se pudo obtener el perfil del usuario");
+  }
+  const perfil = await response.json();
+  return perfil.idUsuario;
+};
+
+// --- Thunks ----------------------------------------------------------------
+
+// a) Obtiene el carrito del usuario logueado; si no existe (404) lo crea.
+export const fetchCart = createAsyncThunk(
+  "cart/fetchCart",
+  async (_, { rejectWithValue }) => {
+    try {
+      const usuarioId = await fetchUsuarioId();
+
+      let response = await fetchConAuth(`${API_BASE}/carritos/usuario/${usuarioId}`);
+
+      // Si el carrito no existe todavía, lo creamos con POST.
+      if (response.status === 404) {
+        response = await fetchConAuth(`${API_BASE}/carritos`, {
+          method: "POST",
+          body: JSON.stringify({ usuarioId }),
+        });
+      }
+
+      if (!response.ok) {
+        throw new Error("No se pudo obtener el carrito");
+      }
+
+      const carrito = await response.json();
+      return mapCarrito(carrito);
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  },
+);
+
+// b) Agrega un item al carrito. Si no hay carrito en el state, lo carga primero.
+export const addItemToCart = createAsyncThunk(
+  "cart/addItemToCart",
+  async ({ recetaId, cantidad = 1 }, { getState, dispatch, rejectWithValue }) => {
+    try {
+      let cartId = getState().cart.cartId;
+
+      // Si todavía no tenemos carrito, lo obtenemos/creamos.
+      if (!cartId) {
+        const result = await dispatch(fetchCart()).unwrap();
+        cartId = result.cartId;
+      }
+
+      const response = await fetchConAuth(`${API_BASE}/carritos/${cartId}/recetas`, {
+        method: "POST",
+        body: JSON.stringify({ recetaId, cantidad }),
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudo agregar la receta al carrito");
+      }
+
+      const carrito = await response.json();
+      return mapCarrito(carrito);
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  },
+);
+
+// c) Actualiza la cantidad de un detalle (cantidad va como query param).
+export const updateItemQuantity = createAsyncThunk(
+  "cart/updateItemQuantity",
+  async ({ detalleId, cantidad }, { getState, rejectWithValue }) => {
+    try {
+      const cartId = getState().cart.cartId;
+
+      const response = await fetchConAuth(
+        `${API_BASE}/carritos/${cartId}/recetas/${detalleId}?cantidad=${cantidad}`,
+        { method: "PATCH" },
+      );
+
+      if (!response.ok) {
+        throw new Error("No se pudo actualizar la cantidad");
+      }
+
+      // El backend devuelve solo el CarritoDetalleDTO actualizado.
+      const detalle = await response.json();
+      return mapDetalle(detalle);
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  },
+);
+
+// d) Elimina un detalle del carrito.
+export const removeItemFromCart = createAsyncThunk(
+  "cart/removeItemFromCart",
+  async (detalleId, { getState, rejectWithValue }) => {
+    try {
+      const cartId = getState().cart.cartId;
+
+      const response = await fetchConAuth(
+        `${API_BASE}/carritos/${cartId}/recetas/${detalleId}`,
+        { method: "DELETE" },
+      );
+
+      if (!response.ok) {
+        throw new Error("No se pudo quitar la receta del carrito");
+      }
+
+      const carrito = await response.json();
+      return mapCarrito(carrito);
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  },
+);
+
+// e) Vacía el carrito (DELETE /vaciar → 204).
+export const clearCartApi = createAsyncThunk(
+  "cart/clearCartApi",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const cartId = getState().cart.cartId;
+
+      const response = await fetchConAuth(`${API_BASE}/carritos/${cartId}/vaciar`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudo vaciar el carrito");
+      }
+
+      return true;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  },
+);
+
+// --- Slice -----------------------------------------------------------------
 
 const initialState = {
+  cartId: null,
   cartItems: [],
+  precioTotal: 0,
+  loading: false,
+  error: null,
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    addToCart: (state, action) => {
-      const product = action.payload;
-      const existingItem = state.cartItems.find((item) => item.id === product.id);
+    // Reinicia el carrito al cerrar sesión.
+    resetCartState: () => initialState,
+  },
+  extraReducers: (builder) => {
+    // Helpers para los estados pending/rejected compartidos.
+    const setPending = (state) => {
+      state.loading = true;
+      state.error = null;
+    };
+    const setRejected = (state, action) => {
+      state.loading = false;
+      state.error = action.payload ?? action.error?.message ?? "Error desconocido";
+    };
 
-      if (existingItem) {
-        existingItem.cantidad += 1;
-        return;
-      }
+    builder
+      // fetchCart
+      .addCase(fetchCart.pending, setPending)
+      .addCase(fetchCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cartId = action.payload.cartId;
+        state.cartItems = action.payload.cartItems;
+        state.precioTotal = action.payload.precioTotal;
+      })
+      .addCase(fetchCart.rejected, setRejected)
 
-      state.cartItems.push({ ...product, cantidad: 1 });
-    },
-    removeFromCart: (state, action) => {
-      const productId = action.payload;
-      state.cartItems = state.cartItems.filter((item) => item.id !== productId);
-    },
-    clearCart: (state) => {
-      state.cartItems = [];
-    },
+      // addItemToCart
+      .addCase(addItemToCart.pending, setPending)
+      .addCase(addItemToCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cartId = action.payload.cartId;
+        state.cartItems = action.payload.cartItems;
+        state.precioTotal = action.payload.precioTotal;
+      })
+      .addCase(addItemToCart.rejected, setRejected)
+
+      // updateItemQuantity (actualiza solo ese item y recalcula el total)
+      .addCase(updateItemQuantity.pending, setPending)
+      .addCase(updateItemQuantity.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.cartItems.findIndex((item) => item.id === action.payload.id);
+        if (index !== -1) {
+          state.cartItems[index] = action.payload;
+        }
+        state.precioTotal = state.cartItems.reduce(
+          (acc, item) => acc + Number(item.subtotal ?? 0),
+          0,
+        );
+      })
+      .addCase(updateItemQuantity.rejected, setRejected)
+
+      // removeItemFromCart
+      .addCase(removeItemFromCart.pending, setPending)
+      .addCase(removeItemFromCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cartId = action.payload.cartId;
+        state.cartItems = action.payload.cartItems;
+        state.precioTotal = action.payload.precioTotal;
+      })
+      .addCase(removeItemFromCart.rejected, setRejected)
+
+      // clearCartApi
+      .addCase(clearCartApi.pending, setPending)
+      .addCase(clearCartApi.fulfilled, (state) => {
+        state.loading = false;
+        state.cartItems = [];
+        state.precioTotal = 0;
+      })
+      .addCase(clearCartApi.rejected, setRejected);
   },
 });
 
-export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
+export const { resetCartState } = cartSlice.actions;
+
+// --- Selectores ------------------------------------------------------------
 export const selectCartItems = (state) => state.cart.cartItems;
+export const selectCartId = (state) => state.cart.cartId;
+export const selectCartTotal = (state) => state.cart.precioTotal;
+export const selectCartLoading = (state) => state.cart.loading;
+export const selectCartError = (state) => state.cart.error;
 
 export default cartSlice.reducer;

@@ -8,6 +8,7 @@ import RecetaList from "./catalogoDeProductos/RecetaList";
 import RecetaDetalle from "./catalogoDeProductos/RecetaDetalle";
 import Favorite from "./catalogoDeProductos/Favorite";
 import Cart from "./catalogoDeProductos/Cart";
+import MisCompras from "./catalogoDeProductos/MisCompras";
 import UserLogin from "./gestionDeUsuarios/UserLogin";
 import UserRegister from "./gestionDeUsuarios/UserRegister";
 import UserProfile from "./gestionDeUsuarios/UserProfile";
@@ -64,6 +65,14 @@ function App() {
             element={
               <RutaProtegida>
                 <Cart />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/mis-compras"
+            element={
+              <RutaProtegida>
+                <MisCompras />
               </RutaProtegida>
             }
           />

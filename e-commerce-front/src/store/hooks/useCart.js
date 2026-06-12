@@ -1,33 +1,81 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, clearCart, removeFromCart, selectCartItems } from "../cartSlice";
+import {
+  fetchCart,
+  addItemToCart,
+  updateItemQuantity,
+  removeItemFromCart,
+  clearCartApi,
+  selectCartItems,
+  selectCartTotal,
+  selectCartLoading,
+  selectCartError,
+} from "../cartSlice";
 
 export function useCart() {
   const dispatch = useDispatch();
   const cartItems = useSelector(selectCartItems);
+  const total = useSelector(selectCartTotal);
+  const loading = useSelector(selectCartLoading);
+  const error = useSelector(selectCartError);
 
-  const handleAddToCart = useCallback(
+  // Al montar, si hay sesión iniciada, cargamos el carrito desde el backend.
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch]);
+
+  // Agrega un producto al carrito. Resolvemos el recetaId desde las distintas
+  // formas en que llega (receta del catálogo o item del carrito).
+  const addToCart = useCallback(
     (product) => {
-      dispatch(addToCart(product));
+      const recetaId = product.recetaId ?? product.idReceta ?? product.id;
+      dispatch(addItemToCart({ recetaId, cantidad: 1 }));
     },
     [dispatch],
   );
 
-  const handleRemoveFromCart = useCallback(
-    (productId) => {
-      dispatch(removeFromCart(productId));
+  // Suma 1 unidad a un item del carrito (PATCH con la cantidad nueva).
+  const increaseQuantity = useCallback(
+    (item) => {
+      dispatch(updateItemQuantity({ detalleId: item.id, cantidad: item.cantidad + 1 }));
     },
     [dispatch],
   );
 
-  const handleClearCart = useCallback(() => {
-    dispatch(clearCart());
+  // Resta 1 unidad; si llega a 0 o menos, elimina el item del carrito.
+  const decreaseQuantity = useCallback(
+    (item) => {
+      if (item.cantidad <= 1) {
+        dispatch(removeItemFromCart(item.id));
+        return;
+      }
+      dispatch(updateItemQuantity({ detalleId: item.id, cantidad: item.cantidad - 1 }));
+    },
+    [dispatch],
+  );
+
+  const removeFromCart = useCallback(
+    (detalleId) => {
+      dispatch(removeItemFromCart(detalleId));
+    },
+    [dispatch],
+  );
+
+  const clearCart = useCallback(() => {
+    dispatch(clearCartApi());
   }, [dispatch]);
 
   return {
     cartItems,
-    addToCart: handleAddToCart,
-    removeFromCart: handleRemoveFromCart,
-    clearCart: handleClearCart,
+    total,
+    loading,
+    error,
+    addToCart,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+    clearCart,
   };
 }

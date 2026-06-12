@@ -1,22 +1,61 @@
 // Importamos componentes de routing.
 import { Link, useNavigate } from "react-router-dom";
+// useDispatch para despachar el thunk de crear pedido.
+import { useDispatch } from "react-redux";
 // Importamos nuestro custom hook para acceder al store del carrito.
 import { useCart } from "../store/hooks/useCart";
+// Thunk para registrar el pedido al finalizar la compra.
+import { createPedido } from "../store/pedidosSlice";
 
 // --- COMPONENTE CONSUMIDOR: PÁGINA DEL CARRITO ---
 // Este componente muestra los productos agregados al carrito, permite modificar
 // cantidades, quitarlos, vaciarlo y "finalizar la compra".
 function Cart() {
   // Usamos el hook `useCart` para obtener el estado y las funciones del carrito.
-  const { cartItems, removeFromCart, clearCart, addToCart } = useCart();
-  // useNavigate para redirigir al catálogo desde el botón.
+  const {
+    cartItems,
+    total,
+    loading,
+    error,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+    clearCart,
+  } = useCart();
+  // useNavigate para redirigir al catálogo / mis compras desde los botones.
   const navigate = useNavigate();
+  // useDispatch para despachar el thunk de crear pedido.
+  const dispatch = useDispatch();
 
-  // Calculamos el total recorriendo todos los items y sumando precio * cantidad.
-  const total = cartItems.reduce(
-    (acc, item) => acc + Number(item.precio ?? 0) * item.cantidad,
-    0
-  );
+  // Finaliza la compra: crea el pedido en el backend, vacía el carrito y redirige.
+  const handleFinalizarCompra = async () => {
+    try {
+      await dispatch(createPedido({ total })).unwrap();
+      clearCart();
+      alert("¡Compra realizada con éxito!");
+      navigate("/mis-compras");
+    } catch (err) {
+      alert(`No se pudo finalizar la compra: ${err}`);
+    }
+  };
+
+  // Estado de carga (patrón del profe).
+  if (loading) {
+    return (
+      <section className="catalog-section">
+        <div className="catalog-state">Cargando carrito...</div>
+      </section>
+    );
+  }
+
+  // Estado de error.
+  if (error) {
+    return (
+      <section className="catalog-section">
+        <div className="catalog-state catalog-state-error">Error: {error}</div>
+      </section>
+    );
+  }
 
   // Renderizado condicional: si el carrito está vacío, mostramos un mensaje.
   if (cartItems.length === 0) {
@@ -75,13 +114,15 @@ function Cart() {
               </p>
               <p style={{ margin: 0, fontWeight: "bold" }}>
                 Subtotal: $
-                {(Number(item.precio ?? 0) * item.cantidad).toLocaleString("es-AR")}
+                {Number(item.subtotal ?? 0).toLocaleString("es-AR")}
               </p>
             </div>
 
             <div style={{ display: "flex", gap: "8px" }}>
-              {/* Botón para sumar 1 unidad (vuelve a llamar a addToCart) */}
-              <button onClick={() => addToCart(item)}>+1</button>
+              {/* Botón para restar 1 unidad (si llega a 0 elimina el item) */}
+              <button onClick={() => decreaseQuantity(item)}>-1</button>
+              {/* Botón para sumar 1 unidad */}
+              <button onClick={() => increaseQuantity(item)}>+1</button>
               {/* Botón para quitar el producto del carrito */}
               <button
                 onClick={() => removeFromCart(item.id)}
@@ -105,11 +146,11 @@ function Cart() {
           alignItems: "center",
         }}
       >
-        <h2>Total: ${total.toLocaleString("es-AR")}</h2>
+        <h2>Total: ${Number(total ?? 0).toLocaleString("es-AR")}</h2>
         <div style={{ display: "flex", gap: "8px" }}>
           <button onClick={clearCart}>Vaciar carrito</button>
           <button
-            onClick={() => alert("¡Compra realizada con éxito!")}
+            onClick={handleFinalizarCompra}
             style={{
               background: "#2a9d8f",
               color: "white",
