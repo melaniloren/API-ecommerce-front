@@ -149,7 +149,7 @@ export const clearCartApi = createAsyncThunk(
     try {
       const cartId = getState().cart.cartId;
 
-      const response = await fetchConAuth(`${API_BASE}/carritos/${cartId}/vaciar`, {
+      const response = await fetchConAuth(`${API_BASE}/carritos/vaciar/${cartId}`, {
         method: "DELETE",
       });
 
