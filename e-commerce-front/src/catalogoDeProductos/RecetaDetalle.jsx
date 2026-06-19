@@ -24,14 +24,22 @@ function RecetaDetalle() {
       setError(null);
 
       try {
-        const [recipe, allRecipes, recipeDetails] = await Promise.all([
+        const [recipe, allRecipes] = await Promise.all([
           loadRecetaById(id),
           loadRecetas(),
-          loadRecipeDetailsByRecipe(id),
         ]);
 
         if (!recipe) {
           throw new Error("Receta no encontrada");
+        }
+
+        // Los productos vinculados salen de un endpoint que puede estar protegido:
+        // si falla (sin sesión / 401), mostramos la receta igual sin esa sección.
+        let recipeDetails = [];
+        try {
+          recipeDetails = await loadRecipeDetailsByRecipe(id);
+        } catch {
+          recipeDetails = [];
         }
 
         const categoriaPrincipal = getCategoryName(recipe.categorias ?? []);
@@ -47,14 +55,20 @@ function RecetaDetalle() {
         setReceta(recipe);
         setRelacionadas(sugeridas);
         setProductos(
-          recipeDetails.map((detail) => ({
-            id: detail.ingredienteId,
-            nombre: detail.ingredienteNombre,
-            descripcion: detail.ingredienteDescripcion,
-            stock: detail.ingredienteStock,
-            cantidad: detail.cantidad,
-            unidad: detail.unidad,
-          })),
+          recipeDetails.map((detail) => {
+            // El backend puede devolver el ingrediente plano (ingredienteNombre),
+            // con campos sueltos (nombre) o anidado en un objeto (ingrediente).
+            const ing = detail.ingrediente ?? {};
+            return {
+              id: detail.ingredienteId ?? detail.idIngrediente ?? ing.id ?? ing.idIngrediente,
+              nombre: detail.ingredienteNombre ?? detail.nombre ?? ing.nombre ?? ing.nombreIngrediente,
+              descripcion:
+                detail.ingredienteDescripcion ?? detail.descripcion ?? ing.descripcion,
+              stock: detail.ingredienteStock ?? detail.stock ?? ing.stock,
+              cantidad: detail.cantidad,
+              unidad: detail.unidad,
+            };
+          }),
         );
       } catch (err) {
         setError(err.message);
@@ -136,7 +150,6 @@ function RecetaDetalle() {
                 <p className="section-kicker">Productos de la receta</p>
                 <h2>Ingredientes o productos asociados</h2>
               </div>
-              <p>Esta seccion se alimenta desde receta-detalles con los vinculos reales.</p>
             </div>
 
             {productos.length === 0 ? (
