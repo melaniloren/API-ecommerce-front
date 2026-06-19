@@ -106,24 +106,26 @@ function Cart() {
               background: "#fff",
             }}
           >
-            <div>
+              <div>
               <h3 style={{ margin: 0 }}>{item.nombre ?? "Sin nombre"}</h3>
+              {/* Le quitamos la palabra "Cantidad" de este texto */}
               <p style={{ margin: "4px 0", color: "#666" }}>
-                Cantidad: {item.cantidad} | Precio unitario: $
-                {Number(item.precio ?? 0).toLocaleString("es-AR")}
+                Precio unitario: ${Number(item.precio ?? 0).toLocaleString("es-AR")}
               </p>
               <p style={{ margin: 0, fontWeight: "bold" }}>
-                Subtotal: $
-                {Number(item.subtotal ?? 0).toLocaleString("es-AR")}
+                Subtotal: ${Number(item.subtotal ?? 0).toLocaleString("es-AR")}
               </p>
             </div>
 
             <div className="cart-quantity-controls">
-              {/* Botón para restar 1 unidad */}
-              <button className="cart-btn-qty" onClick={() => decreaseQuantity(item)}>-1</button>
-              {/* Botón para sumar 1 unidad */}
-              <button className="cart-btn-qty" onClick={() => increaseQuantity(item)}>+1</button>
-              {/* Botón para quitar el producto del carrito */}
+              {/* Nueva estructura de píldora para la cantidad */}
+              <div className="quantity-selector-pill">
+                <button className="cart-btn-qty" onClick={() => decreaseQuantity(item)}>-1</button>
+                <span className="quantity-text"> {item.cantidad}</span>
+                <button className="cart-btn-qty" onClick={() => increaseQuantity(item)}>+1</button>
+              </div>
+
+              {/* Botón quitar se mantiene afuera */}
               <button className="cart-btn-remove" onClick={() => removeFromCart(item.id)}>
                 Quitar
               </button>
