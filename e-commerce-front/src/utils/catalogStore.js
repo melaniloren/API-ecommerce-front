@@ -1,7 +1,9 @@
 const API_BASE = "http://localhost:8080/api";
 
 const requestJson = async (url, options = {}) => {
-  const response = await fetch(url, options);
+  // Enviamos la cookie HttpOnly de sesión por si el endpoint quedó protegido
+  // tras la migración a autenticación por cookie.
+  const response = await fetch(url, { credentials: "include", ...options });
 
   if (!response.ok) {
     throw new Error(`No se pudo completar la solicitud a ${url}`);
