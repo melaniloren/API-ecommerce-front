@@ -18,13 +18,15 @@ export function useCart() {
   const total = useSelector(selectCartTotal);
   const loading = useSelector(selectCartLoading);
   const error = useSelector(selectCartError);
+  // Estado de sesión desde Redux (rehidratado vía cookie).
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
-  // Al montar, si hay sesión iniciada, cargamos el carrito desde el backend.
+  // Cuando hay sesión iniciada, cargamos el carrito desde el backend.
   useEffect(() => {
-    if (localStorage.getItem("token")) {
+    if (isAuthenticated) {
       dispatch(fetchCart());
     }
-  }, [dispatch]);
+  }, [dispatch, isAuthenticated]);
 
   // Agrega un producto al carrito. Resolvemos el recetaId desde las distintas
   // formas en que llega (receta del catálogo o item del carrito).

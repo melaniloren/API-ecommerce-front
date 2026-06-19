@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { esAdmin } from "../utils/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { esAdmin, logoutUser } from "../store/authSlice";
+import { resetCartState } from "../store/cartSlice";
 import { useCart } from "../store/hooks/useCart";
 import "../styles/Navbar.css";
 
@@ -8,17 +10,21 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const logueado = !!localStorage.getItem("token");
+  const dispatch = useDispatch();
+  // Estado de sesión desde Redux.
+  const logueado = useSelector((state) => state.auth.isAuthenticated);
+  const isAdmin = useSelector(esAdmin);
   const { cartItems } = useCart();
 
   const isActive = (path) => location.pathname === path;
   const closeMenu = () => setMenuOpen(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  const handleLogout = async () => {
+    // Cerramos sesión en el backend (borra la cookie) y limpiamos el estado.
+    await dispatch(logoutUser());
+    dispatch(resetCartState());
     closeMenu();
     navigate("/");
-    window.location.reload();
   };
 
   return (
@@ -122,7 +128,7 @@ function Navbar() {
                 </Link>
               </li>
 
-              {esAdmin() && (
+              {isAdmin && (
                 <li>
                   <Link
                     to="/admin"

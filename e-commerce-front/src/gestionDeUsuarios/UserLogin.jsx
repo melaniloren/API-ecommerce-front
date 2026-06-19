@@ -1,42 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, fetchCurrentUser } from "../store/authSlice";
 
-const UserLogin = ({ onLoginExitoso }) => {
+const UserLogin = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  // Estado de sesión desde Redux.
+  const { isAuthenticated, isLoading, error } = useSelector((state) => state.auth);
   const [credentials, setCredentials] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
-      });
-
-      if (!response.ok) {
-        throw new Error("Credenciales inválidas o error en el servidor");
-      }
-
-      const token = await response.text();
-      localStorage.setItem("token", token);
-      onLoginExitoso?.();
-      navigate("/perfil");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    // El thunk setea la cookie; el estado se actualiza en los extraReducers.
+    dispatch(loginUser(credentials));
   };
+
+  // Cuando el login fue exitoso, completamos user/roles y vamos al perfil.
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchCurrentUser());
+      navigate("/perfil");
+    }
+  }, [isAuthenticated, dispatch, navigate]);
 
   return (
     <section className="auth-page">
@@ -87,8 +77,8 @@ const UserLogin = ({ onLoginExitoso }) => {
               />
             </label>
 
-            <button className="auth-submit" type="submit" disabled={loading}>
-              {loading ? "Ingresando..." : "Ingresar"}
+            <button className="auth-submit" type="submit" disabled={isLoading}>
+              {isLoading ? "Ingresando..." : "Ingresar"}
             </button>
           </form>
 

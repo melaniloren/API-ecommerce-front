@@ -1,15 +1,15 @@
 /**
- * Realiza un fetch incluyendo automáticamente el token JWT del localStorage.
+ * Realiza un fetch enviando automáticamente la cookie HttpOnly de sesión.
+ * El token ya no se guarda en el front: viaja en la cookie "token" que el
+ * navegador adjunta gracias a credentials: "include".
  * Usarlo en cualquier endpoint protegido del backend.
  */
 const fetchConAuth = async (url, options = {}) => {
-    const token = localStorage.getItem('token');
-
     const response = await fetch(url, {
         ...options,
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
             ...options.headers,
         },
     });

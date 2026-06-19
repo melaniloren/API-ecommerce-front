@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 // Importamos componentes de routing.
 import { Link, useNavigate } from "react-router-dom";
+// useSelector para leer el estado de sesión desde Redux.
+import { useSelector } from "react-redux";
 // Importamos nuestros custom hooks para acceder al store de favoritos y al carrito.
 import { useFavorite } from "../store/hooks/useFavorite";
 import { useCart } from "../store/hooks/useCart";
@@ -35,7 +37,7 @@ function RecetaList({ variant = "catalog" }) {
   
   // useNavigate para redirigir al login si el usuario no tiene sesión iniciada.
   const navigate = useNavigate();
-  const logueado = !!localStorage.getItem("token");
+  const logueado = useSelector((state) => state.auth.isAuthenticated);
 
   // useEffect para cargar las recetas y categorías desde la API de forma simultánea
   useEffect(() => {

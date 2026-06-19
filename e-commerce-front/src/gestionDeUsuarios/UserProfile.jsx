@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import fetchConAuth from "../utils/fetchConAuth";
 
 const UserProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -8,17 +9,9 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Asumiendo que enviamos un token en los headers para identificar al usuario
-        const token = localStorage.getItem("token");
-        const response = await fetch(
+        // La sesión viaja en la cookie HttpOnly: fetchConAuth la adjunta solo.
+        const response = await fetchConAuth(
           "http://localhost:8080/api/usuarios/perfil",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          },
         );
 
         if (!response.ok) {

@@ -30,6 +30,7 @@ const FormularioReceta = ({ recetaParaEditar }) => {
     try {
       const response = await fetch(url, {
         method: method,
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
