@@ -118,16 +118,13 @@ function Cart() {
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: "8px" }}>
-              {/* Botón para restar 1 unidad (si llega a 0 elimina el item) */}
-              <button onClick={() => decreaseQuantity(item)}>-1</button>
+            <div className="cart-quantity-controls">
+              {/* Botón para restar 1 unidad */}
+              <button className="cart-btn-qty" onClick={() => decreaseQuantity(item)}>-1</button>
               {/* Botón para sumar 1 unidad */}
-              <button onClick={() => increaseQuantity(item)}>+1</button>
+              <button className="cart-btn-qty" onClick={() => increaseQuantity(item)}>+1</button>
               {/* Botón para quitar el producto del carrito */}
-              <button
-                onClick={() => removeFromCart(item.id)}
-                style={{ color: "#e63946" }}
-              >
+              <button className="cart-btn-remove" onClick={() => removeFromCart(item.id)}>
                 Quitar
               </button>
             </div>
@@ -148,7 +145,7 @@ function Cart() {
       >
         <h2>Total: ${Number(total ?? 0).toLocaleString("es-AR")}</h2>
         <div style={{ display: "flex", gap: "8px" }}>
-          <button onClick={clearCart}>Vaciar carrito</button>
+          <button className="cart-btn-clear" onClick={clearCart}>Vaciar carrito</button>
           <button
             onClick={handleFinalizarCompra}
             style={{
@@ -166,7 +163,7 @@ function Cart() {
       </div>
 
       <div style={{ marginTop: "24px" }}>
-        <Link to="/catalogo">← Seguir comprando</Link>
+        <Link className="cart-link-back" to="/catalogo">← Seguir comprando</Link>
       </div>
     </section>
   );

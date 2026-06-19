@@ -1618,4 +1618,86 @@ hr {
     align-items: flex-start;
     flex-direction: column;
   }
+/* ================================================================
+   BOTONES DEL CARRITO
+   ================================================================ */
+.cart-quantity-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Botones de +1 y -1 */
+.cart-btn-qty {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+  color: var(--color-text) !important;
+  cursor: pointer;
+  font-weight: bold;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0 !important;
+}
+
+.cart-btn-qty:hover {
+  background: var(--color-border) !important;
+  color: var(--color-primary) !important;
+}
+
+/* Botón Quitar */
+.cart-btn-remove {
+  background: rgba(231, 76, 60, 0.1) !important;
+  border: 1px solid var(--color-danger) !important;
+  border-radius: 6px !important;
+  color: var(--color-danger) !important;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 0 12px !important;
+  height: 32px;
+  transition: all 0.2s;
+}
+
+.cart-btn-remove:hover {
+  background: var(--color-danger) !important;
+  color: #fff !important;
+}
+
+/* Botón Vaciar Carrito */
+.cart-btn-clear {
+  background: transparent !important;
+  border: 2px solid var(--color-text-muted) !important;
+  border-radius: var(--radius) !important;
+  color: var(--color-text-muted) !important;
+  cursor: pointer;
+  font-weight: 800;
+  padding: 10px 20px !important;
+  transition: all 0.2s;
+}
+
+.cart-btn-clear:hover {
+  border-color: var(--color-danger) !important;
+  color: var(--color-danger) !important;
+}
+
+/* Enlace Seguir comprando */
+.cart-link-back {
+  color: var(--color-primary);
+  font-weight: 800;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.2s;
+}
+
+.cart-link-back:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
 }
