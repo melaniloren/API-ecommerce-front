@@ -468,6 +468,13 @@ hr {
   color: var(--color-primary);
   display: flex;
   justify-content: center;
+  overflow: hidden;
+}
+
+.receta-image img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .receta-image span {
@@ -954,6 +961,13 @@ hr {
   justify-self: center;
   max-width: 320px;
   width: 100%;
+  overflow: hidden;
+}
+
+.recipe-detail-art img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .recipe-detail-art-letter {
@@ -1258,6 +1272,64 @@ hr {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.admin-image-field {
+  display: grid;
+  gap: .55rem;
+}
+
+.admin-image-upload {
+  align-items: center;
+  display: grid;
+  gap: .9rem;
+  grid-template-columns: 160px minmax(0, 1fr);
+}
+
+.admin-image-preview {
+  align-items: center;
+  aspect-ratio: 4 / 3;
+  background:
+    radial-gradient(rgba(0, 0, 0, .035) .8px, transparent .8px),
+    #fff8f2;
+  background-size: 8px 8px;
+  border: 1px solid rgba(232, 205, 181, .9);
+  border-radius: var(--radius);
+  color: var(--color-text-soft);
+  display: flex;
+  font-size: .88rem;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.admin-image-preview img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.admin-image-upload input[type="file"] {
+  background: rgba(255, 248, 242, .82);
+  cursor: pointer;
+  margin-bottom: .45rem;
+  padding: .6rem;
+}
+
+.admin-image-upload small {
+  color: var(--color-text-soft);
+  display: block;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.admin-clear-image {
+  background: transparent;
+  border: 0;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 800;
+  margin-top: .45rem;
+  padding: 0;
+}
+
 .admin-form-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1300,6 +1372,31 @@ hr {
   gap: 1rem;
   justify-content: space-between;
   padding: 1rem;
+}
+
+.admin-item-photo {
+  align-items: center;
+  background:
+    radial-gradient(rgba(0, 0, 0, .035) .8px, transparent .8px),
+    #fff8f2;
+  background-size: 8px 8px;
+  border: 1px solid rgba(232, 205, 181, .8);
+  border-radius: var(--radius);
+  color: var(--color-primary);
+  display: flex;
+  flex: 0 0 92px;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  height: 72px;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.admin-item-photo img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .admin-item-main {
@@ -1441,7 +1538,8 @@ hr {
   }
 
   .admin-section-grid,
-  .admin-form-grid {
+  .admin-form-grid,
+  .admin-image-upload {
     grid-template-columns: 1fr;
   }
 }

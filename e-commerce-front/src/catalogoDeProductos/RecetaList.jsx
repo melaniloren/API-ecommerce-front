@@ -19,6 +19,8 @@ const homeCategories = [
 
 // Función auxiliar para obtener la categoría de la receta
 const getRecipeCategory = (receta) => receta.categorias?.[0]?.nombre ?? "Especial";
+const getRecipeImage = (receta) =>
+  receta.imagen ?? receta.foto ?? receta.imagenUrl ?? receta.imageUrl ?? receta.urlImagen ?? "";
 
 // --- COMPONENTE CONSUMIDOR: LISTA DE RECETAS ---
 // Este componente es responsable de mostrar el catálogo, filtrar por categorías
@@ -174,6 +176,7 @@ function RecetaList({ variant = "catalog" }) {
         <div className="receta-grid">
           {recipesToShow.map((receta) => {
             const favorito = logueado ? esFavorito(receta.id) : false;
+            const recipeImage = getRecipeImage(receta);
 
             return (
               <Link to={`/recetas/${receta.id}`} key={receta.id} className="receta-link">
@@ -188,8 +191,12 @@ function RecetaList({ variant = "catalog" }) {
                     {favorito ? "♥" : "♡"}
                   </button>
 
-                  <div className="receta-image" aria-hidden="true">
-                    <span>{(receta.nombre ?? "R").charAt(0).toUpperCase()}</span>
+                  <div className="receta-image">
+                    {recipeImage ? (
+                      <img src={recipeImage} alt={receta.nombre ?? "Receta"} />
+                    ) : (
+                      <span>{(receta.nombre ?? "R").charAt(0).toUpperCase()}</span>
+                    )}
                   </div>
 
                   <div className="receta-card-body">

@@ -6,6 +6,7 @@ const buildInitialForm = (recetaEditar) => ({
   descripcion: recetaEditar?.descripcion ?? "",
   precio: recetaEditar?.precio ?? "",
   categoriaId: recetaEditar?.categorias?.[0]?.idCategoria ?? "",
+  imagen: recetaEditar?.imagen ?? recetaEditar?.foto ?? recetaEditar?.imagenUrl ?? "",
 });
 
 function CrearReceta({
@@ -32,6 +33,27 @@ function CrearReceta({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      setFormData((prev) => ({ ...prev, imagen: "" }));
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      alert("Selecciona un archivo de imagen valido.");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setFormData((prev) => ({ ...prev, imagen: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const toggleProduct = (productId) => {
     setSelectedProductIds((prev) =>
       prev.includes(String(productId))
@@ -50,6 +72,7 @@ function CrearReceta({
         descripcion: formData.descripcion,
         precio: parseFloat(formData.precio),
         categorias: formData.categoriaId ? [parseInt(formData.categoriaId, 10)] : [],
+        imagen: formData.imagen || null,
       };
 
       const response = await fetchConAuth(
@@ -112,6 +135,32 @@ function CrearReceta({
             onChange={handleChange}
             required
           />
+        </label>
+
+        <label className="admin-image-field">
+          Foto de la receta
+          <div className="admin-image-upload">
+            <div className="admin-image-preview">
+              {formData.imagen ? (
+                <img src={formData.imagen} alt="Vista previa de la receta" />
+              ) : (
+                <span>Sin foto</span>
+              )}
+            </div>
+            <div>
+              <input type="file" accept="image/*" onChange={handleImageChange} />
+              <small>Subi una imagen JPG, PNG o WebP para mostrarla en el catalogo.</small>
+              {formData.imagen && (
+                <button
+                  className="admin-clear-image"
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, imagen: "" }))}
+                >
+                  Quitar foto
+                </button>
+              )}
+            </div>
+          </div>
         </label>
 
         <div className="admin-form-grid">

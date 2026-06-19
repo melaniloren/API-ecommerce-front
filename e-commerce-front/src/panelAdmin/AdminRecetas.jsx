@@ -21,6 +21,9 @@ const tabs = [
   { id: "categorias", label: "Categorias" },
 ];
 
+const getRecipeImage = (receta = {}) =>
+  receta.imagen ?? receta.foto ?? receta.imagenUrl ?? receta.imageUrl ?? receta.urlImagen ?? "";
+
 function AdminRecetas() {
   const [activeTab, setActiveTab] = useState("recetas");
   const [recetas, setRecetas] = useState([]);
@@ -189,6 +192,13 @@ function AdminRecetas() {
 
                   return (
                     <article className="admin-item-card" key={receta.id}>
+                      <div className="admin-item-photo" aria-hidden="true">
+                        {getRecipeImage(receta) ? (
+                          <img src={getRecipeImage(receta)} alt="" />
+                        ) : (
+                          <span>{(receta.nombre ?? "R").charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
                       <div className="admin-item-main">
                         <div className="admin-item-meta">
                           {(receta.categorias ?? []).map((categoria) => (

@@ -8,6 +8,8 @@ import {
 
 const getInitial = (nombre = "") => nombre.trim().charAt(0).toUpperCase() || "R";
 const getCategoryName = (categorias = []) => categorias[0]?.nombre ?? "Especial";
+const getRecipeImage = (receta = {}) =>
+  receta.imagen ?? receta.foto ?? receta.imagenUrl ?? receta.imageUrl ?? receta.urlImagen ?? "";
 
 function RecetaDetalle() {
   const { id } = useParams();
@@ -113,7 +115,11 @@ function RecetaDetalle() {
 
         <div className="recipe-detail-visual" aria-hidden="true">
           <div className="recipe-detail-art">
-            <div className="recipe-detail-art-letter">{getInitial(receta.nombre)}</div>
+            {getRecipeImage(receta) ? (
+              <img src={getRecipeImage(receta)} alt="" />
+            ) : (
+              <div className="recipe-detail-art-letter">{getInitial(receta.nombre)}</div>
+            )}
           </div>
           <div className="recipe-detail-note">
             <strong>Armado de la receta</strong>
@@ -195,8 +201,12 @@ function RecetaDetalle() {
             {relacionadas.map((item) => (
               <Link to={`/recetas/${item.id}`} key={item.id} className="receta-link">
                 <article className="receta-card">
-                  <div className="receta-image" aria-hidden="true">
-                    <span>{getInitial(item.nombre ?? "")}</span>
+                  <div className="receta-image">
+                    {getRecipeImage(item) ? (
+                      <img src={getRecipeImage(item)} alt={item.nombre ?? "Receta"} />
+                    ) : (
+                      <span>{getInitial(item.nombre ?? "")}</span>
+                    )}
                   </div>
                   <div className="receta-card-body">
                     <h3>{item.nombre}</h3>
