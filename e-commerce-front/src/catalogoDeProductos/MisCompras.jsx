@@ -1,7 +1,7 @@
 // Hooks de React y Redux.
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // Thunks y selectores del slice de pedidos.
 import {
   fetchPedidos,
@@ -15,6 +15,7 @@ import {
 // Lista los pedidos del usuario logueado y permite eliminarlos.
 function MisCompras() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const pedidos = useSelector(selectPedidos);
   const loading = useSelector(selectPedidosLoading);
   const error = useSelector(selectPedidosError);
@@ -61,9 +62,12 @@ function MisCompras() {
       {pedidos.length === 0 ? (
         <div className="catalog-empty">
           Todavía no realizaste ninguna compra.
-          <Link to="/catalogo" style={{ marginLeft: "12px" }}>
+          <button
+            className="btn-empty-state"
+            onClick={() => navigate("/catalogo")}
+          >
             Ver catálogo
-          </Link>
+          </button>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -91,8 +95,8 @@ function MisCompras() {
               </div>
 
               <button
+                className="btn-fav-remove"
                 onClick={() => handleEliminar(pedido.id)}
-                style={{ color: "#e63946" }}
               >
                 Eliminar
               </button>
@@ -102,7 +106,7 @@ function MisCompras() {
       )}
 
       <div style={{ marginTop: "24px" }}>
-        <Link to="/catalogo">← Seguir comprando</Link>
+        <Link className="cart-link-back" to="/catalogo">← Seguir comprando</Link>
       </div>
     </section>
   );

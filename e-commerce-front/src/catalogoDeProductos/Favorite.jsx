@@ -26,15 +26,15 @@ function Favorite() {
         <div className="catalog-heading">
           <h1>Mis favoritos</h1>
         </div>
-        <div className="catalog-empty">
-          Todavía no agregaste recetas a tus favoritos.
-          <button
-            onClick={() => navigate("/catalogo")}
-            style={{ marginLeft: "12px" }}
-          >
-            Ver catálogo
-          </button>
-        </div>
+          <div className="catalog-empty">
+            Todavía no agregaste recetas a tus favoritos.
+            <button
+              className="btn-empty-state"
+              onClick={() => navigate("/catalogo")}
+            >
+              Ver catálogo
+            </button>
+          </div>
       </section>
     );
   }
@@ -82,12 +82,15 @@ function Favorite() {
                   </p>
 
                   <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
-                    <button onClick={() => navigate(`/recetas/${receta.id}`)}>
+                    <button 
+                      className="btn-fav-detail" 
+                      onClick={() => navigate(`/recetas/${receta.id}`)}
+                    >
                       Ver detalle
                     </button>
                     <button
+                      className="btn-fav-remove"
                       onClick={() => addToFavorite(receta)}
-                      style={{ color: "#e63946" }}
                     >
                       ♥ Quitar
                     </button>
@@ -100,7 +103,8 @@ function Favorite() {
       )}
 
       <div style={{ marginTop: "24px" }}>
-        <Link to="/catalogo">← Volver al catálogo</Link>
+        {/* Reutilizamos la clase cart-link-back para mantener el mismo estilo de enlace */}
+        <Link className="cart-link-back" to="/catalogo">← Volver al catálogo</Link>
       </div>
     </section>
   );
