@@ -67,8 +67,8 @@ function Cart() {
         <div className="catalog-empty">
           Tu carrito está vacío.
           <button
+            className="btn-empty-state"
             onClick={() => navigate("/catalogo")}
-            style={{ marginLeft: "12px" }}
           >
             Ver catálogo
           </button>
