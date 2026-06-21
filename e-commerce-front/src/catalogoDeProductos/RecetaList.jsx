@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { useFavorite } from "../store/hooks/useFavorite";
 import { useCart } from "../store/hooks/useCart";
 import { loadCategories, loadRecetas } from "../utils/catalogStore";
+import toast from "react-hot-toast"; // Para mostrar notificaciones al usuario
 
 // Categorías hardcodeadas que se muestran solo en la vista "home".
 const homeCategories = [
@@ -36,7 +37,7 @@ function RecetaList({ variant = "catalog" }) {
   // Usamos los custom hooks para obtener funciones de los contextos.
   const { addToFavorite, esFavorito } = useFavorite();
   const { addToCart } = useCart();
-  
+
   // useNavigate para redirigir al login si el usuario no tiene sesión iniciada.
   const navigate = useNavigate();
   const logueado = useSelector((state) => state.auth.isAuthenticated);
@@ -120,6 +121,14 @@ function RecetaList({ variant = "catalog" }) {
     }
 
     addToFavorite(receta);
+
+    // Verificamos si ya era favorito para saber qué mensaje mostrar
+    const yaEsFavorito = esFavorito(receta.id);
+    if (yaEsFavorito) {
+      toast.error("Receta quitada de favoritos"); // Usa el estilo rojo
+    } else {
+      toast.success("¡Receta guardada en favoritos!"); // Usa el estilo verde
+    }
   };
 
   // Handler del botón "Agregar al carrito"
@@ -133,6 +142,7 @@ function RecetaList({ variant = "catalog" }) {
     }
 
     addToCart(receta);
+    toast.success("¡Agregado al carrito!"); // Notificación de éxito
   };
 
   // Renderizamos la lista de recetas con sus filtros.

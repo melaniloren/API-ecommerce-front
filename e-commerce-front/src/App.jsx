@@ -13,6 +13,7 @@ import UserLogin from "./gestionDeUsuarios/UserLogin";
 import UserRegister from "./gestionDeUsuarios/UserRegister";
 import UserProfile from "./gestionDeUsuarios/UserProfile";
 import AdminRecetas from "./panelAdmin/AdminRecetas";
+import { Toaster } from 'react-hot-toast'; // Corrección aquí: lleva llaves
 
 function App() {
   // useLocation funciona porque el <BrowserRouter> ahora envuelve a <App /> en main.jsx.
@@ -109,6 +110,41 @@ function App() {
           <a href="#">Preguntas Frecuentes</a>
         </nav>
       </footer>
+
+      {/* Agregá el Toaster al final, antes de cerrar el div principal */}
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          // Estilo por defecto (éxito)
+          style: {
+            background: '#e6f9ef',
+            color: '#27ae60', // Tu --color-success
+            border: '1px solid #b7e4c7',
+            fontWeight: 'bold',
+            fontFamily: 'sans-serif',
+            padding: '12px 20px',
+            borderRadius: '10px'
+          },
+          success: {
+            iconTheme: {
+              primary: '#27ae60',
+              secondary: '#e6f9ef',
+            },
+          },
+          // Estilo personalizado para cuando se quita algo
+          error: {
+            style: {
+              background: '#fde8e8',
+              color: '#e74c3c', // Tu --color-danger
+              border: '1px solid #f5c6c6',
+            },
+            iconTheme: {
+              primary: '#e74c3c',
+              secondary: '#fde8e8',
+            },
+          }
+        }}
+      />
     </div>
     // </AuthProvider>
   );
