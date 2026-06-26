@@ -12,10 +12,10 @@ import toast from "react-hot-toast"; // Para mostrar notificaciones al usuario
 
 // Categorías hardcodeadas que se muestran solo en la vista "home".
 const homeCategories = [
-  { title: "Saludables & Frescos", eyebrow: "Favoritos", className: "feature-large" },
-  { title: "Pizzas", className: "feature-small" },
-  { title: "Carnes", className: "feature-small" },
-  { title: "Dulces", className: "feature-tall" },
+  { title: "Saludables & Frescos", eyebrow: "Favoritos", className: "feature-large", image: "/cat-saludables.webp" },
+  { title: "Pizzas", className: "feature-small", image: "/cat-pizzas.webp" },
+  { title: "Carnes", className: "feature-small", image: "/cat-carnes.webp" },
+  { title: "Dulces", className: "feature-tall", image: "/cat-dulces.jpg" },
 ];
 
 // Función auxiliar para obtener la categoría de la receta
@@ -89,8 +89,15 @@ function RecetaList({ variant = "catalog" }) {
 
         <div className="inspiration-grid">
           {homeCategories.map((category) => (
-            <article className={`inspiration-card ${category.className}`} key={category.title}>
-              <span className="inspiration-icon" aria-hidden="true"></span>
+            <article
+              className={`inspiration-card ${category.className}`}
+              key={category.title}
+              style={category.image ? {
+                backgroundImage: `url(${category.image})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              } : undefined}
+            >
               <div>
                 {category.eyebrow && <small>{category.eyebrow}</small>}
                 <h2>{category.title}</h2>

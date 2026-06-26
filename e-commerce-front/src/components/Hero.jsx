@@ -45,7 +45,11 @@ function Hero() {
             <strong>+120 recetas</strong>
           </div>
           <div className="hero-plate">
-            <span className="hero-image-icon"></span>
+            <img
+              src="/risotto.webp"
+              alt="Risotto cremoso de estación"
+              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "inherit" }}
+            />
           </div>
           <h2>Risotto cremoso de estación</h2>
           <p className="hero-meta">

@@ -532,6 +532,10 @@ hr {
   font-size: .94rem;
   line-height: 1.5;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .receta-card .receta-detail {
@@ -539,6 +543,7 @@ hr {
   color: #2f6f62 !important;
   font-weight: 800;
   margin-top: auto;
+  margin-top: 0.8rem;
 }
 
 .catalog-cart-button {
@@ -548,7 +553,7 @@ hr {
   color: #fff !important;
   cursor: pointer;
   font-weight: 800;
-  margin-top: .25rem;
+  margin-top: auto; 
   padding: .8rem 1rem;
 }
 
@@ -1231,6 +1236,8 @@ hr {
 .admin-modal-card {
   max-width: 760px;
   width: min(92vw, 760px);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .admin-card-wide {
@@ -1603,8 +1610,11 @@ hr {
 .inspiration-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: 2fr 1fr 1fr;
-  grid-template-rows: repeat(2, 230px);
+  grid-template-columns: 1.5fr 1fr 1fr;
+  grid-template-rows: repeat(2, 240px);
+  grid-template-areas:
+    "large small1 small2"
+    "large tall   tall";
 }
 
 .inspiration-card {
@@ -1650,9 +1660,21 @@ hr {
   line-height: 1.1;
 }
 
-.feature-large,
+.feature-large {
+  grid-area: large;
+}
+
+.feature-small:nth-child(2) {
+  grid-area: small1;
+}
+
+.feature-small:nth-child(3) {
+  grid-area: small2;
+}
+
 .feature-tall {
-  grid-row: span 2;
+  grid-area: tall;
+  grid-column: span 2;
 }
 
 .footer {
