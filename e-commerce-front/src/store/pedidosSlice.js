@@ -35,16 +35,15 @@ export const fetchPedidos = createAsyncThunk(
   }
 );
 
-// POST de un nuevo pedido con la fecha de hoy y el usuario logueado.
+// POST de un nuevo pedido con la fecha de hoy.
+// El backend obtiene el usuarioId desde el token JWT en la cookie.
 export const createPedido = createAsyncThunk(
   "pedidos/createPedido",
   async ({ total }, { rejectWithValue }) => {
     try {
-      const usuarioId = await fetchUsuarioId();
-
       const response = await fetchConAuth(`${API_BASE}/pedidos`, {
         method: "POST",
-        body: JSON.stringify({ fecha: fechaHoy(), total, usuarioId }),
+        body: JSON.stringify({ fecha: fechaHoy(), total }),
       });
 
       if (!response.ok) {

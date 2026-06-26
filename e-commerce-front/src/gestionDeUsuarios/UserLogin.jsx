@@ -1,69 +1,75 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import fetchConAuth from "../utils/fetchConAuth";
-import { fetchPedidos, selectPedidos, selectPedidosLoading } from "../store/pedidosSlice";
+import { useNavigate, Link } from "react-router-dom";
+import { loginUser, fetchCurrentUser, selectAuth } from "../store/authSlice";
 
-const UserProfile = () => {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const UserLogin = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLoading, error } = useSelector(selectAuth);
 
-  const pedidos = useSelector(selectPedidos);
-  const pedidosLoading = useSelector(selectPedidosLoading);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await fetchConAuth("http://localhost:8080/api/usuarios/perfil");
-        if (!response.ok) throw new Error("Error al cargar el perfil");
-        setProfile(await response.json());
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-    if (pedidos.length === 0) dispatch(fetchPedidos());
-  }, [dispatch]);
-
-  if (loading) return <div>Cargando perfil...</div>;
-  if (error)   return <div>Error: {error}</div>;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await dispatch(loginUser({ email, password })).unwrap();
+      await dispatch(fetchCurrentUser()).unwrap();
+      navigate("/catalogo");
+    } catch (err) {
+      // el error ya queda en Redux state
+    }
+  };
 
   return (
-    <div style={{ maxWidth:"600px", margin:"2rem auto", padding:"2rem",
-                  border:"1px solid #ddd", borderRadius:"8px" }}>
-      <h1>Mi Perfil</h1>
-      <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
-        <p><strong>Nombre:</strong> {profile?.nombre}</p>
-        <p><strong>Apellido:</strong> {profile?.apellido}</p>
-        <p><strong>Email:</strong> {profile?.email}</p>
-      </div>
-
-      <hr style={{ margin:"2rem 0" }} />
-
-      <h2>Mis Recetas Compradas</h2>
-      {pedidosLoading ? (
-        <p>Cargando compras...</p>
-      ) : pedidos.length === 0 ? (
-        <p style={{ color:"#666" }}>Aún no adquiriste ninguna receta.</p>
-      ) : (
-        <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
-          {pedidos.map(pedido => (
-            <div key={pedido.id}
-                style={{ padding:"12px", border:"1px solid #eee",
-                          borderRadius:"6px", background:"#f9f9f9" }}>
-              <strong>Pedido #{pedido.id}</strong>
-              <span style={{ marginLeft:"12px", color:"#666" }}>
-                {pedido.fecha} — ${Number(pedido.total ?? 0).toLocaleString("es-AR")}
-              </span>
-            </div>
-          ))}
+    <div style={{ maxWidth: "400px", margin: "4rem auto", padding: "2rem",
+                  border: "1px solid #ddd", borderRadius: "8px" }}>
+      <h1>Iniciar sesión</h1>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div>
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ display: "block", width: "100%", padding: "8px", marginTop: "4px",
+                     border: "1px solid #ccc", borderRadius: "4px" }}
+          />
         </div>
-      )}
+        <div>
+          <label htmlFor="password">Contraseña</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ display: "block", width: "100%", padding: "8px", marginTop: "4px",
+                     border: "1px solid #ccc", borderRadius: "4px" }}
+          />
+        </div>
+
+        {error && (
+          <p style={{ color: "#dc2626", margin: 0 }}>{error}</p>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          style={{ padding: "10px", background: "#2a9d8f", color: "white",
+                   border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}
+        >
+          {isLoading ? "Ingresando..." : "Ingresar"}
+        </button>
+      </form>
+
+      <p style={{ marginTop: "1rem", textAlign: "center" }}>
+        ¿No tenés cuenta? <Link to="/register">Registrate</Link>
+      </p>
     </div>
   );
 };
 
-export default UserProfile;
+export default UserLogin;
