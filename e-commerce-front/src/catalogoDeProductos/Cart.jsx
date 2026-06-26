@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { useCart } from "../store/hooks/useCart";
 // Thunk para registrar el pedido al finalizar la compra.
 import { createPedido } from "../store/pedidosSlice";
+import toast from "react-hot-toast";
 
 // --- COMPONENTE CONSUMIDOR: PÁGINA DEL CARRITO ---
 // Este componente muestra los productos agregados al carrito, permite modificar
@@ -32,10 +33,10 @@ function Cart() {
     try {
       await dispatch(createPedido({ total })).unwrap();
       clearCart();
-      alert("¡Compra realizada con éxito!");
+      toast.success("¡Compra realizada con éxito! 🎉");
       navigate("/mis-compras");
     } catch (err) {
-      alert(`No se pudo finalizar la compra: ${err}`);
+      toast.error(`No se pudo finalizar la compra: ${err}`);
     }
   };
 
@@ -106,7 +107,7 @@ function Cart() {
               background: "#fff",
             }}
           >
-              <div>
+            <div>
               <h3 style={{ margin: 0 }}>{item.nombre ?? "Sin nombre"}</h3>
               {/* Le quitamos la palabra "Cantidad" de este texto */}
               <p style={{ margin: "4px 0", color: "#666" }}>

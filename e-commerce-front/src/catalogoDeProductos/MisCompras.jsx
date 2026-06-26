@@ -14,6 +14,7 @@ import {
 // --- PÁGINA: MIS COMPRAS ---
 // Lista los pedidos del usuario logueado y permite eliminarlos.
 function MisCompras() {
+  const [confirmandoId, setConfirmandoId] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const pedidos = useSelector(selectPedidos);
@@ -26,7 +27,12 @@ function MisCompras() {
   }, [dispatch]);
 
   const handleEliminar = (id) => {
-    dispatch(deletePedido(id));
+    if (confirmandoId === id) {
+      dispatch(deletePedido(id));
+      setConfirmandoId(null);
+    } else {
+      setConfirmandoId(id);
+    }
   };
 
   // Estado de carga (patrón del profe).
@@ -94,12 +100,19 @@ function MisCompras() {
                 </p>
               </div>
 
-              <button
-                className="btn-fav-remove"
-                onClick={() => handleEliminar(pedido.id)}
-              >
-                Eliminar
-              </button>
+              {confirmandoId === pedido.id ? (
+                <>
+                  <span style={{ color: "#dc2626", fontSize: "14px" }}>¿Seguro?</span>
+                  <button className="btn-fav-remove" onClick={() => handleEliminar(pedido.id)}>
+                    Sí, eliminar
+                  </button>
+                  <button onClick={() => setConfirmandoId(null)}>Cancelar</button>
+                </>
+              ) : (
+                <button className="btn-fav-remove" onClick={() => handleEliminar(pedido.id)}>
+                  Eliminar
+                </button>
+              )}
             </article>
           ))}
         </div>

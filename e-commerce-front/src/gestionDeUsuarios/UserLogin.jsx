@@ -1,94 +1,69 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, fetchCurrentUser } from "../store/authSlice";
+import fetchConAuth from "../utils/fetchConAuth";
+import { fetchPedidos, selectPedidos, selectPedidosLoading } from "../store/pedidosSlice";
 
-const UserLogin = () => {
-  const navigate = useNavigate();
+const UserProfile = () => {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
-  // Estado de sesión desde Redux.
-  const { isAuthenticated, isLoading, error } = useSelector((state) => state.auth);
-  const [credentials, setCredentials] = useState({ email: "", password: "" });
 
-  const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
-  };
+  const pedidos = useSelector(selectPedidos);
+  const pedidosLoading = useSelector(selectPedidosLoading);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // El thunk setea la cookie; el estado se actualiza en los extraReducers.
-    dispatch(loginUser(credentials));
-  };
-
-  // Cuando el login fue exitoso, completamos user/roles y vamos al perfil.
   useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(fetchCurrentUser());
-      navigate("/perfil");
-    }
-  }, [isAuthenticated, dispatch, navigate]);
+    const fetchProfile = async () => {
+      try {
+        const response = await fetchConAuth("http://localhost:8080/api/usuarios/perfil");
+        if (!response.ok) throw new Error("Error al cargar el perfil");
+        setProfile(await response.json());
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+    if (pedidos.length === 0) dispatch(fetchPedidos());
+  }, [dispatch]);
+
+  if (loading) return <div>Cargando perfil...</div>;
+  if (error)   return <div>Error: {error}</div>;
 
   return (
-    <section className="auth-page">
-      <div className="auth-shell">
-        <aside className="auth-aside" aria-hidden="true">
-          <p className="section-kicker">Volvé a tu cocina</p>
-          <h2>Guardá favoritas, comprá más rápido y seguí tus recetas.</h2>
-          <div className="auth-plate">
-            <span>🥘</span>
-          </div>
-          <div className="auth-mini-card">
-            <strong>Tip del día</strong>
-            <span>Prepará tus ingredientes antes de empezar.</span>
-          </div>
-        </aside>
-
-        <div className="auth-card">
-          <div className="auth-header">
-            <p className="section-kicker">Ingresar</p>
-            <h1>Iniciar sesión</h1>
-            <p>Accedé a tu cuenta para continuar con RecetaMarket.</p>
-          </div>
-
-          {error && <div className="auth-alert auth-alert-error">Error: {error}</div>}
-
-          <form className="auth-form" onSubmit={handleLogin}>
-            <label>
-              Correo electrónico
-              <input
-                type="email"
-                name="email"
-                placeholder="tu@email.com"
-                value={credentials.email}
-                onChange={handleChange}
-                required
-              />
-            </label>
-
-            <label>
-              Contraseña
-              <input
-                type="password"
-                name="password"
-                placeholder="Ingresá tu contraseña"
-                value={credentials.password}
-                onChange={handleChange}
-                required
-              />
-            </label>
-
-            <button className="auth-submit" type="submit" disabled={isLoading}>
-              {isLoading ? "Ingresando..." : "Ingresar"}
-            </button>
-          </form>
-
-          <p className="auth-switch">
-            ¿Todavía no tenés cuenta? <Link to="/register">Registrate</Link>
-          </p>
-        </div>
+    <div style={{ maxWidth:"600px", margin:"2rem auto", padding:"2rem",
+                  border:"1px solid #ddd", borderRadius:"8px" }}>
+      <h1>Mi Perfil</h1>
+      <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+        <p><strong>Nombre:</strong> {profile?.nombre}</p>
+        <p><strong>Apellido:</strong> {profile?.apellido}</p>
+        <p><strong>Email:</strong> {profile?.email}</p>
       </div>
-    </section>
+
+      <hr style={{ margin:"2rem 0" }} />
+
+      <h2>Mis Recetas Compradas</h2>
+      {pedidosLoading ? (
+        <p>Cargando compras...</p>
+      ) : pedidos.length === 0 ? (
+        <p style={{ color:"#666" }}>Aún no adquiriste ninguna receta.</p>
+      ) : (
+        <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
+          {pedidos.map(pedido => (
+            <div key={pedido.id}
+                style={{ padding:"12px", border:"1px solid #eee",
+                          borderRadius:"6px", background:"#f9f9f9" }}>
+              <strong>Pedido #{pedido.id}</strong>
+              <span style={{ marginLeft:"12px", color:"#666" }}>
+                {pedido.fecha} — ${Number(pedido.total ?? 0).toLocaleString("es-AR")}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
-export default UserLogin;
+export default UserProfile;

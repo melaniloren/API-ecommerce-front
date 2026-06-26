@@ -3,6 +3,7 @@ import fetchConAuth from "../utils/fetchConAuth";
 
 const API_BASE = "http://localhost:8080/api";
 
+/*
 // Obtiene el usuarioId desde GET /api/usuarios/perfil.
 const fetchUsuarioId = async () => {
   const response = await fetchConAuth(`${API_BASE}/usuarios/perfil`);
@@ -12,8 +13,9 @@ const fetchUsuarioId = async () => {
   const perfil = await response.json();
   return perfil.idUsuario;
 };
-
+*/
 // Devuelve la fecha de hoy en formato YYYY-MM-DD.
+
 const fechaHoy = () => new Date().toISOString().slice(0, 10);
 
 // --- Thunks ----------------------------------------------------------------
@@ -23,20 +25,14 @@ export const fetchPedidos = createAsyncThunk(
   "pedidos/fetchPedidos",
   async (_, { rejectWithValue }) => {
     try {
-      const usuarioId = await fetchUsuarioId();
-
-      const response = await fetchConAuth(`${API_BASE}/pedidos`);
-      if (!response.ok) {
-        throw new Error("No se pudieron obtener los pedidos");
-      }
-
+      const response = await fetchConAuth(`${API_BASE}/pedidos/mis-pedidos`);
+      if (!response.ok) throw new Error("No se pudieron obtener los pedidos");
       const pedidos = await response.json();
-      const lista = Array.isArray(pedidos) ? pedidos : [];
-      return lista.filter((pedido) => pedido.usuarioId === usuarioId);
+      return Array.isArray(pedidos) ? pedidos : [];
     } catch (err) {
       return rejectWithValue(err.message);
     }
-  },
+  }
 );
 
 // POST de un nuevo pedido con la fecha de hoy y el usuario logueado.
