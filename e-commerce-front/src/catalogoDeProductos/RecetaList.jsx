@@ -172,7 +172,7 @@ function RecetaList({ variant = "catalog" }) {
         >
           Todas
         </button>
-        {categorias.map((categoria) => (
+        {[...categorias].sort((a, b) => a.nombre.localeCompare(b.nombre)).map((categoria) => (
           <button
             className={String(categoriaActiva) === String(categoria.idCategoria) ? "catalog-filter active" : "catalog-filter"}
             key={categoria.idCategoria}

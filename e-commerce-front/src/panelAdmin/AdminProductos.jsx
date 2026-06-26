@@ -122,7 +122,7 @@ function AdminProductos({ products, onSaveProduct, onDeleteProduct }) {
           <div className="catalog-empty">Todavia no agregaste productos.</div>
         ) : (
           <div className="admin-stack">
-            {products.map((product) => {
+            {[...products].sort((a, b) => a.nombre.localeCompare(b.nombre)).map((product) => {
               return (
                 <article className="admin-item-card" key={product.id}>
                   <div>

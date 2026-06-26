@@ -9,6 +9,10 @@ function Favorite() {
   // Usamos el hook `useFavorite` para obtener la lista y la función para quitar/agregar.
   const { favoriteItems, addToFavorite } = useFavorite();
 
+  // Misma lógica que en el catálogo: probamos varios nombres de campo posibles para la imagen.
+   const getRecipeImage = (receta) =>
+    receta.imagen ?? receta.foto ?? receta.imagenUrl ?? receta.imageUrl ?? receta.urlImagen ?? "";
+
   // useParams: si la URL es /favoritos/:id, leemos el id para mostrar solo esa receta.
   const { id } = useParams();
   // useNavigate: para redirigir al detalle o al catálogo desde botones.
@@ -65,11 +69,16 @@ function Favorite() {
             const name = receta.nombre ?? "Sin nombre";
             const desc = receta.descripcion ?? "Sin descripción";
             const price = receta.precio ?? 0;
+            const recipeImage = getRecipeImage(receta);
 
             return (
               <article className="receta-card" key={receta.id}>
                 <div className="receta-image" aria-hidden="true">
-                  <span>{name.charAt(0).toUpperCase()}</span>
+                  {recipeImage ? (
+                    <img src={recipeImage} alt={name} />
+                  ) : (
+                    <span>{name.charAt(0).toUpperCase()}</span>
+                  )}
                 </div>
 
                 <div className="receta-card-body">

@@ -68,7 +68,7 @@ function AdminCategorias({
         </div>
 
         <div className="admin-stack">
-          {categories.map((category) => {
+          {[...categories].sort((a, b) => a.nombre.localeCompare(b.nombre)).map((category) => {
             const isEditing = String(editingId) === String(category.idCategoria);
 
             return (
