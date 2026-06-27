@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { esAdmin, logoutUser } from "../store/authSlice";
 import { resetCartState } from "../store/cartSlice";
 import { useCart } from "../store/hooks/useCart";
+import { useTheme } from "../context/ThemeContext";
 import "../styles/Navbar.css";
 
 function Navbar() {
@@ -15,6 +16,8 @@ function Navbar() {
   const logueado = useSelector((state) => state.auth.isAuthenticated);
   const isAdmin = useSelector(esAdmin);
   const { cartItems } = useCart();
+
+  const { theme, toggleTheme } = useTheme();
 
   const isActive = (path) => location.pathname === path;
   const closeMenu = () => setMenuOpen(false);
@@ -34,17 +37,29 @@ function Navbar() {
           RecetaMarket
         </Link>
 
-        <button
-          className="hamburger"
-          type="button"
-          aria-label="Abrir menú"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <button
+            className="theme-toggle"
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+            title={theme === "dark" ? "Modo claro" : "Modo oscuro"}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+
+          <button
+            className="hamburger"
+            type="button"
+            aria-label="Abrir menú"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
 
         <ul className={menuOpen ? "nav-menu nav-open" : "nav-menu"}>
           <li>
