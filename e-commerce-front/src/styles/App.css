@@ -2074,3 +2074,31 @@ hr {
 .theme-toggle:hover {
   background: rgba(255, 255, 255, .22);
 }
+[data-theme="dark"] .auth-shell {
+  background:
+    linear-gradient(135deg, rgba(35, 25, 23, .98), rgba(26, 18, 16, .95)),
+    linear-gradient(120deg, #1a1210, #2a1e1b);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .auth-card {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .auth-form input {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .hero-recipe-card {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .hero-plate {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,.1), transparent 34%),
+    linear-gradient(135deg, #2a1e1b, #3a2218);
+}
