@@ -35,15 +35,10 @@ const UserProfile = () => {
   if (!profile) return <div>No se encontró la información del perfil.</div>;
 
   return (
-    <div
-      style={{
-        maxWidth: "600px",
-        margin: "2rem auto",
-        padding: "2rem",
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-      }}
-    >
+    <div style={{
+      background: "var(--color-surface)", padding: "2rem", borderRadius: "8px",
+      border: "1px solid var(--color-border)"
+    }}>
       <h1>Mi Perfil</h1>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <p>
@@ -61,7 +56,7 @@ const UserProfile = () => {
 
       <h2>Mis Recetas Compradas</h2>
       {/* Aquí podrías mapear las recetas asociadas al usuario de manera similar a ProductList */}
-      <p style={{ color: "#666" }}>Aún no has adquirido ninguna receta.</p>
+      <p style={{ color: "var(--color-text-muted)" }}>Aún no has adquirido ninguna receta.</p>
     </div>
   );
 };

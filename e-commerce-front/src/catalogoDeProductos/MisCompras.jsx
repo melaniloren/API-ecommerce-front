@@ -92,7 +92,7 @@ function MisCompras() {
             >
               <div>
                 <h3 style={{ margin: 0 }}>Pedido #{pedido.id}</h3>
-                <p style={{ margin: "4px 0", color: "#666" }}>
+                <p style={{ margin: "4px 0", color: "var(--color-text-muted)" }}>
                   Fecha: {pedido.fecha}
                 </p>
                 <p style={{ margin: 0, fontWeight: "bold" }}>
@@ -102,7 +102,7 @@ function MisCompras() {
 
               {confirmandoId === pedido.id ? (
                 <>
-                  <span style={{ color: "#dc2626", fontSize: "14px" }}>¿Seguro?</span>
+                  <span style={{ color: "var(--color-danger)", fontSize: "14px" }}>¿Seguro?</span>
                   <button className="btn-fav-remove" onClick={() => handleEliminar(pedido.id)}>
                     Sí, eliminar
                   </button>

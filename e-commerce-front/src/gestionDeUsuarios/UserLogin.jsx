@@ -22,8 +22,10 @@ const UserLogin = () => {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "4rem auto", padding: "2rem",
-                  border: "1px solid #ddd", borderRadius: "8px" }}>
+    <div style={{
+      maxWidth: "400px", margin: "4rem auto", padding: "2rem",
+      background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px"
+    }}>
       <h1>Iniciar sesión</h1>
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         <div>
@@ -34,8 +36,11 @@ const UserLogin = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={{ display: "block", width: "100%", padding: "8px", marginTop: "4px",
-                     border: "1px solid #ccc", borderRadius: "4px" }}
+            style={{
+              display: "block", width: "100%", padding: "8px", marginTop: "4px",
+              border: "1px solid var(--color-border)", borderRadius: "4px",
+              background: "var(--color-bg)", color: "var(--color-text)"
+            }}
           />
         </div>
         <div>
@@ -46,20 +51,25 @@ const UserLogin = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ display: "block", width: "100%", padding: "8px", marginTop: "4px",
-                     border: "1px solid #ccc", borderRadius: "4px" }}
+            style={{
+              display: "block", width: "100%", padding: "8px", marginTop: "4px",
+              border: "1px solid var(--color-border)", borderRadius: "4px",
+              background: "var(--color-bg)", color: "var(--color-text)"
+            }}
           />
         </div>
 
         {error && (
-          <p style={{ color: "#dc2626", margin: 0 }}>{error}</p>
+          <p style={{ color: "var(--color-danger)", margin: 0 }}>{error}</p>
         )}
 
         <button
           type="submit"
           disabled={isLoading}
-          style={{ padding: "10px", background: "#2a9d8f", color: "white",
-                   border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}
+          style={{
+            padding: "10px", background: "var(--color-primary)", color: "white",
+            border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold"
+          }}
         >
           {isLoading ? "Ingresando..." : "Ingresar"}
         </button>

@@ -110,7 +110,7 @@ function Cart() {
             <div>
               <h3 style={{ margin: 0 }}>{item.nombre ?? "Sin nombre"}</h3>
               {/* Le quitamos la palabra "Cantidad" de este texto */}
-              <p style={{ margin: "4px 0", color: "#666" }}>
+              <p style={{ margin: "4px 0", color: "var(--color-text-muted)" }}>
                 Precio unitario: ${Number(item.precio ?? 0).toLocaleString("es-AR")}
               </p>
               <p style={{ margin: 0, fontWeight: "bold" }}>
