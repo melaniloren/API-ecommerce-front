@@ -6,8 +6,11 @@ import { resetCartState } from "../store/cartSlice";
 import { useCart } from "../store/hooks/useCart";
 import { useTheme } from "../context/ThemeContext";
 import "../styles/Navbar.css";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 function Navbar() {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -34,10 +37,12 @@ function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-brand" onClick={closeMenu}>
-          RecetaMarket
+          {t("navbar.brand")}
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <LanguageSwitcher />
+          
           <button
             className="theme-toggle"
             type="button"
@@ -68,7 +73,7 @@ function Navbar() {
               className={isActive("/") ? "nav-link active" : "nav-link"}
               onClick={closeMenu}
             >
-              Inicio
+              {t("navbar.home")}
             </Link>
           </li>
           <li>
@@ -77,7 +82,7 @@ function Navbar() {
               className={isActive("/catalogo") ? "nav-link active" : "nav-link"}
               onClick={closeMenu}
             >
-              Catálogo
+              {t("navbar.catalog")}
             </Link>
           </li>
 
@@ -89,7 +94,7 @@ function Navbar() {
                   className={isActive("/login") ? "nav-link active" : "nav-link"}
                   onClick={closeMenu}
                 >
-                  Iniciar sesión
+                  {t("navbar.login")}
                 </Link>
               </li>
               <li>
@@ -98,7 +103,7 @@ function Navbar() {
                   className={isActive("/register") ? "nav-link active" : "nav-link"}
                   onClick={closeMenu}
                 >
-                  Registrarse
+                  {t("navbar.register")}
                 </Link>
               </li>
             </>
@@ -112,7 +117,7 @@ function Navbar() {
                   className={isActive("/favoritos") ? "nav-link active" : "nav-link"}
                   onClick={closeMenu}
                 >
-                  Favoritos
+                  {t("navbar.favorites")}
                 </Link>
               </li>
               <li>
@@ -121,7 +126,7 @@ function Navbar() {
                   className={isActive("/carrito") ? "nav-link active" : "nav-link"}
                   onClick={closeMenu}
                 >
-                  🛒 Carrito ({cartItems.length})
+                  🛒 {t("navbar.cart")} ({cartItems.length})
                 </Link>
               </li>
               <li>
@@ -130,7 +135,7 @@ function Navbar() {
                   className={isActive("/mis-compras") ? "nav-link active" : "nav-link"}
                   onClick={closeMenu}
                 >
-                  Mis compras
+                  {t("navbar.myPurchases")}
                 </Link>
               </li>
               <li>
@@ -139,7 +144,7 @@ function Navbar() {
                   className={isActive("/perfil") ? "nav-link active" : "nav-link"}
                   onClick={closeMenu}
                 >
-                  Mi perfil
+                  {t("navbar.myProfile")}
                 </Link>
               </li>
 
@@ -150,14 +155,14 @@ function Navbar() {
                     className={isActive("/admin") ? "nav-link active" : "nav-link"}
                     onClick={closeMenu}
                   >
-                    Admin
+                    {t("navbar.admin")}
                   </Link>
                 </li>
               )}
 
               <li>
                 <button className="nav-link nav-logout" onClick={handleLogout}>
-                  Cerrar sesión
+                  {t("navbar.logout")}
                 </button>
               </li>
             </>

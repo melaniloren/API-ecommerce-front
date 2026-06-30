@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "i18next": "^23.x.x", 
+    "i18next-browser-languagedetector": "^8.x.x",
     "@reduxjs/toolkit": "^2.12.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",

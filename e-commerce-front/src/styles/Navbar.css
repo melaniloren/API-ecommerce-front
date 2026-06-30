@@ -129,4 +129,23 @@
     text-align: left;
     width: 100%;
   }
+  .language-switcher {
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .28);
+    border-radius: var(--radius);
+    color: #fff8f2;
+    cursor: pointer;
+    font-size: .85rem;
+    font-weight: 600;
+    height: 40px;
+    padding: 0 8px;
+  }
+
+  .language-switcher:hover {
+    background: rgba(255, 255, 255, .2);
+  }
+
+  .language-switcher option {
+    color: #1a1a1a;
+  }
 }
