@@ -5,6 +5,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    dedupe: ['react', 'react-dom', 'react-i18next'] // 👈 Forzamos una única instancia de estos paquetes
+    dedupe: ['react', 'react-dom', 'react-i18next'] //Forzamos una única instancia de estos paquetes para evitar problemas de traducción y contexto en React
   }
 })

@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next";
 
 // El contenido de la base de datos (nombres y descripciones de recetas/productos)
 // está escrito en español. Cuando el idioma activo no es español, traducimos
-// "al vuelo" usando la API gratuita de MyMemory y cacheamos el resultado en
+// usando la API MyMemory y cacheamos el resultado en
 // localStorage para no repetir la misma traducción en cada render/recarga.
+// Todavia no está implementado, solo están las traducciones de los textos estáticos de la app (navbar, botones, etc.) en los archivos JSON de i18n.
 const CACHE_PREFIX = "recetaMarket:dynTranslation:";
 
 const getCacheKey = (text, lang) => `${CACHE_PREFIX}${lang}:${text}`;
