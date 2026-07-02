@@ -14,12 +14,10 @@ import UserRegister from "./gestionDeUsuarios/UserRegister";
 import UserProfile from "./gestionDeUsuarios/UserProfile";
 import AdminRecetas from "./panelAdmin/AdminRecetas";
 import { Toaster } from 'react-hot-toast'; // Corrección aquí: lleva llaves
-import { useTranslation } from "react-i18next";
 
 function App() {
   // useLocation funciona porque el <BrowserRouter> ahora envuelve a <App /> en main.jsx.
   // Detectamos si estamos en la home para aplicarle la clase "home-content" (fondo crema + ancho completo).
-  const { t } = useTranslation();
   const location = useLocation();
   const isHome = location.pathname === "/";
 
@@ -103,13 +101,13 @@ function App() {
       <footer className="footer">
         <div>
           <strong>RecetaMarket</strong>
-          <p>© 2024 RecetaMarket. {t("footer.tagline")}</p>
+          <p>© 2024 RecetaMarket. Sabores artesanales en tu hogar.</p>
         </div>
         <nav aria-label="Enlaces secundarios">
-          <a href="#">{t("footer.privacy")}</a>
-          <a href="#">{t("footer.terms")}</a>
-          <a href="#">{t("footer.contact")}</a>
-          <a href="#">{t("footer.faq")}</a>
+          <a href="#">Privacidad</a>
+          <a href="#">Términos</a>
+          <a href="#">Contacto</a>
+          <a href="#">Preguntas Frecuentes</a>
         </nav>
       </footer>
 
