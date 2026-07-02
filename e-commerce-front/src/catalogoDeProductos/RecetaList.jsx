@@ -53,6 +53,7 @@ function RecetaList({ variant = "catalog" }) {
   const [categoriaActiva, setCategoriaActiva] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [orden, setOrden] = useState("default"); // Estado para el ordenamiento de recetas
 
   // Usamos los custom hooks para obtener funciones de los contextos.
   const { addToFavorite, esFavorito } = useFavorite();
@@ -94,16 +95,33 @@ function RecetaList({ variant = "catalog" }) {
 
   // useMemo para filtrar las recetas eficientemente según la categoría seleccionada
   const recipesToShow = useMemo(() => {
-    if (categoriaActiva === "all") {
-      return recetas;
-    }
+    const filtradas =
+    categoriaActiva === "all"
+      ? recetas
+      : recetas.filter((receta) =>
+          (receta.categorias ?? []).some(
+            (categoria) => String(categoria.idCategoria) === String(categoriaActiva),
+          ),
+        );
 
-    return recetas.filter((receta) =>
-      (receta.categorias ?? []).some(
-        (categoria) => String(categoria.idCategoria) === String(categoriaActiva),
-      ),
-    );
-  }, [categoriaActiva, recetas]);
+  const ordenadas = [...filtradas]; // copia: .sort() muta el array
+
+  switch (orden) {
+    case "precio-asc":
+      ordenadas.sort((a, b) => Number(a.precio ?? 0) - Number(b.precio ?? 0));
+      break;
+    case "nuevas":
+      ordenadas.sort((a, b) => Number(b.id ?? 0) - Number(a.id ?? 0));
+      break;
+    case "alfabetico":
+      ordenadas.sort((a, b) => (a.nombre ?? "").localeCompare(b.nombre ?? ""));
+      break;
+    default:
+      break;
+  }
+
+  return ordenadas;
+}, [categoriaActiva, recetas, orden]);
 
   // Variante "home": muestra solo las categorías destacadas, no el catálogo entero.
   if (variant === "home") {
@@ -218,6 +236,16 @@ function RecetaList({ variant = "catalog" }) {
             {categoria.nombre}
           </button>
         ))}
+      </div>
+
+      <div className="catalog-sort">
+        <label htmlFor="ordenar-por">Ordenar por:</label>
+        <select id="ordenar-por" value={orden} onChange={(e) => setOrden(e.target.value)}>
+          <option value="default">Relevancia</option>
+          <option value="precio-asc">Precio: menor a mayor</option>
+          <option value="nuevas">Más nuevas</option>
+          <option value="alfabetico">Alfabético (A-Z)</option>
+        </select>
       </div>
 
       {/* Grid de Recetas Filtradas */}
