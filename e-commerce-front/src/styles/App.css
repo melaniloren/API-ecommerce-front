@@ -1655,11 +1655,19 @@ hr {
   background-size: auto, 8px 8px, auto;
   border-radius: 18px;
   color: #fff;
+  cursor: pointer;
   display: flex;
   justify-content: space-between;
   overflow: hidden;
   padding: 1.55rem;
   position: relative;
+  text-decoration: none;
+  transition: transform .2s ease;
+}
+
+.inspiration-card:hover {
+  color: #fff;
+  transform: translateY(-2px);
 }
 
 .inspiration-card .inspiration-icon {

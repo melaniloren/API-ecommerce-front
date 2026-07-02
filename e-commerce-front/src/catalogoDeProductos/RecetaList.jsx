@@ -1,7 +1,7 @@
 // Importamos React y los hooks necesarios.
 import { useEffect, useMemo, useState } from "react";
 // Importamos componentes de routing.
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 // useSelector para leer el estado de sesión desde Redux.
 import { useSelector } from "react-redux";
 // Importamos nuestros custom hooks para acceder al store de favoritos y al carrito.
@@ -12,7 +12,7 @@ import toast from "react-hot-toast"; // Para mostrar notificaciones al usuario
 
 // Categorías hardcodeadas que se muestran solo en la vista "home".
 const homeCategories = [
-  { title: "Saludables & Frescos", eyebrow: "Favoritos", className: "feature-large", image: "/cat-saludables.webp" },
+  { title: "Saludables & Frescos", className: "feature-large", image: "/cat-saludables.webp" },
   { title: "Pizzas", className: "feature-small", image: "/cat-pizzas.webp" },
   { title: "Carnes", className: "feature-small", image: "/cat-carnes.webp" },
   { title: "Dulces", className: "feature-tall", image: "/cat-dulces.jpg" },
@@ -22,6 +22,26 @@ const homeCategories = [
 const getRecipeCategory = (receta) => receta.categorias?.[0]?.nombre ?? "Especial";
 const getRecipeImage = (receta) =>
   receta.imagen ?? receta.foto ?? receta.imagenUrl ?? receta.imageUrl ?? receta.urlImagen ?? "";
+
+// Normaliza un texto para comparar nombres de categoría sin importar tildes,
+// mayúsculas o símbolos (ej: "Saludables & Frescos" vs "Saludables y Frescos").
+const normalizeCategoryName = (text) =>
+  (text ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+// Busca en las categorías cargadas desde la API una cuyo nombre
+// coincida con el título hardcodeado de la card de "Inspiración para hoy"
+// Si no está esa categoría creada devuelve null
+// y la card lleva al catálogo sin filtrar
+const findMatchingCategoryId = (categorias, title) => {
+  const target = normalizeCategoryName(title);
+  const match = categorias.find((categoria) => normalizeCategoryName(categoria.nombre) === target);
+  return match ? match.idCategoria : null;
+};
 
 // --- COMPONENTE CONSUMIDOR: LISTA DE RECETAS ---
 // Este componente es responsable de mostrar el catálogo, filtrar por categorías
@@ -41,6 +61,16 @@ function RecetaList({ variant = "catalog" }) {
   // useNavigate para redirigir al login si el usuario no tiene sesión iniciada.
   const navigate = useNavigate();
   const logueado = useSelector((state) => state.auth.isAuthenticated);
+
+  // Leemos param "categoria" (lo manda la card de "Inspiración para hoy")
+  const [searchParams] = useSearchParams();
+  const categoriaDesdeUrl = searchParams.get("categoria");
+
+  useEffect(() => {
+    if (categoriaDesdeUrl) {
+      setCategoriaActiva(categoriaDesdeUrl);
+    }
+  }, [categoriaDesdeUrl]);
 
   // useEffect para cargar las recetas y categorías desde la API de forma simultánea
   useEffect(() => {
@@ -88,22 +118,28 @@ function RecetaList({ variant = "catalog" }) {
         </div>
 
         <div className="inspiration-grid">
-          {homeCategories.map((category) => (
-            <article
-              className={`inspiration-card ${category.className}`}
-              key={category.title}
-              style={category.image ? {
-                backgroundImage: `url(${category.image})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              } : undefined}
-            >
-              <div>
-                {category.eyebrow && <small>{category.eyebrow}</small>}
-                <h2>{category.title}</h2>
-              </div>
-            </article>
-          ))}
+          {homeCategories.map((category) => {
+            const categoriaId = findMatchingCategoryId(categorias, category.title);
+            const destino = categoriaId ? `/catalogo?categoria=${categoriaId}` : "/catalogo";
+
+            return (
+              <Link
+                to={destino}
+                className={`inspiration-card ${category.className}`}
+                key={category.title}
+                style={category.image ? {
+                  backgroundImage: `url(${category.image})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                } : undefined}
+              >
+                <div>
+                  {category.eyebrow && <small>{category.eyebrow}</small>}
+                  <h2>{category.title}</h2>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
     );
