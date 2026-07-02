@@ -18,7 +18,7 @@ import {
 const tabs = [
   { id: "recetas", label: "Recetas" },
   { id: "productos", label: "Productos" },
-  { id: "categorias", label: "Categorias" },
+  { id: "categorias", label: "Categorías" },
 ];
 
 const getRecipeImage = (receta = {}) =>
@@ -151,10 +151,10 @@ function AdminRecetas() {
     <section className="admin-page">
       <div className="admin-header">
         <div>
-          <p className="section-kicker">Panel de gestion</p>
-          <h1>Administracion del catalogo</h1>
+          <p className="section-kicker">Panel de gestión</p>
+          <h1>Administración del catálogo</h1>
         </div>
-        <p>Gestiona recetas, productos y categorias desde un solo lugar.</p>
+        <p>Gestioná recetas, productos y categorías desde un solo lugar.</p>
       </div>
 
       <div className="admin-tabs" role="tablist" aria-label="Secciones del panel">

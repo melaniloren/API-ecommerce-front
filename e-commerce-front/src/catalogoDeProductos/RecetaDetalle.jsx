@@ -137,7 +137,7 @@ function RecetaDetalle() {
           </div>
           <div className="recipe-detail-note">
             <strong>Armado de la receta</strong>
-            <span>Los productos mostrados abajo salen de la relacion guardada en backend.</span>
+            <span>Los productos mostrados abajo salen de la relación guardada en backend.</span>
           </div>
         </div>
       </div>
@@ -145,8 +145,8 @@ function RecetaDetalle() {
       <div className="recipe-detail-grid">
         <div className="recipe-detail-main">
           <article className="recipe-detail-card">
-            <p className="section-kicker">Descripcion</p>
-            <h2>Una receta para sumar al catalogo</h2>
+            <p className="section-kicker">Descripción</p>
+            <h2>Conocé más sobre la receta</h2>
             <p>{receta.descripcion}</p>
           </article>
 
@@ -159,7 +159,7 @@ function RecetaDetalle() {
             </div>
 
             {productos.length === 0 ? (
-              <div className="catalog-empty">Todavia no hay productos vinculados a esta receta.</div>
+              <div className="catalog-empty">Todavía no hay productos vinculados a esta receta.</div>
             ) : (
               <div className="recipe-product-grid">
                 {productos.map((producto) => (
@@ -184,7 +184,7 @@ function RecetaDetalle() {
         <aside className="recipe-detail-sidebar">
           <article className="recipe-detail-card recipe-detail-summary">
             <p className="section-kicker">Resumen</p>
-            <h2>Vista rapida</h2>
+            <h2>Vista rápida</h2>
             <div className="recipe-detail-price">
               ${Number(receta.precio ?? 0).toLocaleString("es-AR")}
             </div>
@@ -204,10 +204,10 @@ function RecetaDetalle() {
         <section className="recipe-related-section">
           <div className="catalog-heading recipe-related-heading">
             <div>
-              <p className="section-kicker">Tambien te puede gustar</p>
-              <h2>Mas recetas para mirar</h2>
+              <p className="section-kicker">También te puede gustar</p>
+              <h2>Más recetas para mirar</h2>
             </div>
-            <p>Opciones cercanas en estilo y categoria para seguir navegando.</p>
+            <p>Opciones cercanas en estilo y categoría para seguir navegando.</p>
           </div>
 
           <div className="receta-grid">

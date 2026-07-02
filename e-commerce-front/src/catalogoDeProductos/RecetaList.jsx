@@ -129,10 +129,10 @@ function RecetaList({ variant = "catalog" }) {
       <section className="home-inspiration">
         <div className="home-inspiration-heading">
           <div>
-            <h1>Inspiracion para hoy</h1>
-            <p>Descubrí las categorias mas buscadas por nuestra comunidad.</p>
+            <h1>Inspiración para hoy</h1>
+            <p>Descubrí las categorías más buscadas por nuestra comunidad.</p>
           </div>
-          <Link to="/catalogo">Ver todo el catalogo</Link>
+          <Link to="/catalogo">Ver todo el catálogo</Link>
         </div>
 
         <div className="inspiration-grid">
@@ -165,7 +165,7 @@ function RecetaList({ variant = "catalog" }) {
 
   // Renderizado condicional: mientras se carga o si hubo error.
   if (loading) {
-    return <div className="catalog-state">Cargando el catalogo de recetas...</div>;
+    return <div className="catalog-state">Cargando el catálogo de recetas...</div>;
   }
   if (error) {
     return <div className="catalog-state catalog-state-error">Error: {error}</div>;
@@ -211,8 +211,8 @@ function RecetaList({ variant = "catalog" }) {
     <section className="catalog-section">
       <div className="catalog-heading">
         <div>
-          <p className="section-kicker">Elegi tu proxima comida</p>
-          <h1>Catalogo de recetas</h1>
+          <p className="section-kicker">Elegí tu próxima comida</p>
+          <h1>Catálogo de recetas</h1>
         </div>
         <p>Explorá opciones caseras, simples y listas para sumar a tu mesa.</p>
       </div>
@@ -251,7 +251,7 @@ function RecetaList({ variant = "catalog" }) {
       {/* Grid de Recetas Filtradas */}
       {recipesToShow.length === 0 ? (
         <div className="catalog-empty">
-          No hay recetas disponibles para la categoria seleccionada.
+          No hay recetas disponibles para la categoría seleccionada.
         </div>
       ) : (
         <div className="receta-grid">

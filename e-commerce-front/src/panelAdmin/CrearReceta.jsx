@@ -112,7 +112,7 @@ function CrearReceta({
           <p className="section-kicker">{esEdicion ? "Editar receta" : "Nueva receta"}</p>
           <h2>{esEdicion ? "Actualizar receta" : "Agregar receta"}</h2>
         </div>
-        <p>Completa los datos basicos y elegi los productos que la componen.</p>
+        <p>Completá los datos básicos y elegí los productos que la componen.</p>
       </div>
 
       <form className="admin-form" onSubmit={handleSubmit}>
@@ -128,7 +128,7 @@ function CrearReceta({
         </label>
 
         <label>
-          Descripcion
+          Descripción
           <textarea
             name="descripcion"
             value={formData.descripcion}
@@ -149,7 +149,7 @@ function CrearReceta({
             </div>
             <div>
               <input type="file" accept="image/*" onChange={handleImageChange} />
-              <small>Subi una imagen JPG, PNG o WebP para mostrarla en el catalogo.</small>
+              <small>Subí una imagen JPG, PNG o WebP para mostrarla en el catálogo.</small>
               {formData.imagen && (
                 <button
                   className="admin-clear-image"
@@ -178,14 +178,14 @@ function CrearReceta({
           </label>
 
           <label>
-            Categoria
+            Categoría
             <select
               name="categoriaId"
               value={formData.categoriaId}
               onChange={handleChange}
               required
             >
-              <option value="">Seleccionar categoria</option>
+              <option value="">Seleccionar categoría</option>
               {categories.map((category) => (
                 <option key={category.idCategoria} value={category.idCategoria}>
                   {category.nombre}
@@ -203,7 +203,7 @@ function CrearReceta({
 
           {products.length === 0 ? (
             <div className="catalog-empty">
-              Primero carga productos en el panel para poder asociarlos a la receta.
+              Primero cargá productos en el panel para poder asociarlos a la receta.
             </div>
           ) : (
             <div className="admin-chip-grid">

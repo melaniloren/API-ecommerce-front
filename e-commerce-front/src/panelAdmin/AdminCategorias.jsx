@@ -32,15 +32,15 @@ function AdminCategorias({
       <article className="admin-card">
         <div className="admin-card-heading">
           <div>
-            <p className="section-kicker">Panel de categorias</p>
-            <h2>Editar categorias</h2>
+            <p className="section-kicker">Panel de categorías</p>
+            <h2>Editar categorías</h2>
           </div>
           <p>Podés renombrar las existentes y crear nuevas para organizar productos.</p>
         </div>
 
         <form className="admin-form" onSubmit={handleCreate}>
           <label>
-            Nueva categoria
+            Nueva categoría
             <input
               type="text"
               value={newCategoryName}
@@ -52,7 +52,7 @@ function AdminCategorias({
 
           <div className="admin-form-actions">
             <button className="admin-primary-button" type="submit">
-              Agregar categoria
+              Agregar categoría
             </button>
           </div>
         </form>
@@ -62,9 +62,9 @@ function AdminCategorias({
         <div className="admin-card-heading">
           <div>
             <p className="section-kicker">Listado</p>
-            <h2>Categorias disponibles</h2>
+            <h2>Categorías disponibles</h2>
           </div>
-          <p>{categories.length} categorias visibles en la app.</p>
+          <p>{categories.length} categorías visibles en la app.</p>
         </div>
 
         <div className="admin-stack">
@@ -75,7 +75,7 @@ function AdminCategorias({
               <article className="admin-item-card" key={category.idCategoria}>
                 <div className="admin-item-main">
                   <div className="admin-item-meta">
-                    <span>{category.source === "local" ? "Local" : "Catalogo"}</span>
+                    <span>{category.source === "local" ? "Local" : "Catálogo"}</span>
                   </div>
 
                   {isEditing ? (
@@ -96,8 +96,8 @@ function AdminCategorias({
                       <h3>{category.nombre}</h3>
                       <p>
                         {category.source === "local"
-                          ? "Categoria creada desde el frontend."
-                          : "Categoria sincronizada desde la API o renombrada localmente."}
+                          ? "Categoría creada desde el frontend."
+                          : "Categoría sincronizada desde la API o renombrada localmente."}
                       </p>
                     </>
                   )}
