@@ -97,8 +97,29 @@ export const loadRecetaById = async (recipeId) => {
 };
 
 export const loadRecipeDetailsByRecipe = async (recipeId) => {
-  const data = await requestJson(`${API_BASE}/receta-detalles/receta/${recipeId}`);
-  return Array.isArray(data) ? data : [];
+  const [data, ingredients] = await Promise.all([
+    requestJson(`${API_BASE}/receta-detalles/receta/${recipeId}`),
+    loadIngredients(),
+  ]);
+
+  const items = Array.isArray(data) ? data : [];
+  const ingredientById = new Map(
+    (Array.isArray(ingredients) ? ingredients : []).map((ingredient) => [String(ingredient.id), ingredient]),
+  );
+
+  return items.map((detail) => {
+    const ingredientId = detail.ingredienteId ?? detail.idIngrediente ?? detail.ingrediente?.id;
+    const ingredient = ingredientById.get(String(ingredientId)) ?? detail.ingrediente ?? {};
+
+    return {
+      ...detail,
+      ingrediente: ingredient,
+      ingredienteId: ingredientId ?? detail.ingredienteId ?? detail.idIngrediente,
+      ingredienteNombre: detail.ingredienteNombre ?? detail.nombre ?? ingredient.nombre,
+      ingredienteDescripcion: detail.ingredienteDescripcion ?? detail.descripcion ?? ingredient.descripcion,
+      ingredienteStock: detail.ingredienteStock ?? detail.stock ?? ingredient.stock,
+    };
+  });
 };
 
 export const loadRecipeProductMap = async () => {
