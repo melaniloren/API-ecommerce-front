@@ -187,6 +187,9 @@ const cartSlice = createSlice({
       state.loading = true;
       state.error = null;
     };
+    const setPendingWithoutLoader = (state) => {
+      state.error = null;
+    };
     const setRejected = (state, action) => {
       state.loading = false;
       state.error = action.payload ?? action.error?.message ?? "Error desconocido";
@@ -214,9 +217,8 @@ const cartSlice = createSlice({
       .addCase(addItemToCart.rejected, setRejected)
 
       // updateItemQuantity (actualiza solo ese item y recalcula el total)
-      .addCase(updateItemQuantity.pending, setPending)
+      .addCase(updateItemQuantity.pending, setPendingWithoutLoader)
       .addCase(updateItemQuantity.fulfilled, (state, action) => {
-        state.loading = false;
         const index = state.cartItems.findIndex((item) => item.id === action.payload.id);
         if (index !== -1) {
           state.cartItems[index] = action.payload;
@@ -229,9 +231,8 @@ const cartSlice = createSlice({
       .addCase(updateItemQuantity.rejected, setRejected)
 
       // removeItemFromCart
-      .addCase(removeItemFromCart.pending, setPending)
+      .addCase(removeItemFromCart.pending, setPendingWithoutLoader)
       .addCase(removeItemFromCart.fulfilled, (state, action) => {
-        state.loading = false;
         state.cartId = action.payload.cartId;
         state.cartItems = action.payload.cartItems;
         state.precioTotal = action.payload.precioTotal;
@@ -239,9 +240,8 @@ const cartSlice = createSlice({
       .addCase(removeItemFromCart.rejected, setRejected)
 
       // clearCartApi
-      .addCase(clearCartApi.pending, setPending)
+      .addCase(clearCartApi.pending, setPendingWithoutLoader)
       .addCase(clearCartApi.fulfilled, (state) => {
-        state.loading = false;
         state.cartItems = [];
         state.precioTotal = 0;
       })

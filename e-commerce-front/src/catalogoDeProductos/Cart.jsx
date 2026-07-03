@@ -1,4 +1,5 @@
 // Importamos componentes de routing.
+import { memo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 // useDispatch para despachar el thunk de crear pedido.
 import { useDispatch } from "react-redux";
@@ -7,6 +8,44 @@ import { useCart } from "../store/hooks/useCart";
 // Thunk para registrar el pedido al finalizar la compra.
 import { createPedido } from "../store/pedidosSlice";
 import toast from "react-hot-toast";
+
+const CartItem = memo(function CartItem({ item, onDecrease, onIncrease, onRemove }) {
+  return (
+    <article
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "16px",
+        border: "1px solid #eee",
+        borderRadius: "8px",
+        background: "#fff",
+      }}
+    >
+      <div>
+        <h3 style={{ margin: 0 }}>{item.nombre ?? "Sin nombre"}</h3>
+        <p style={{ margin: "4px 0", color: "var(--color-text-muted)" }}>
+          Precio unitario: ${Number(item.precio ?? 0).toLocaleString("es-AR")}
+        </p>
+        <p style={{ margin: 0, fontWeight: "bold" }}>
+          Subtotal: ${Number(item.subtotal ?? 0).toLocaleString("es-AR")}
+        </p>
+      </div>
+
+      <div className="cart-quantity-controls">
+        <div className="quantity-selector-pill">
+          <button className="cart-btn-qty" onClick={() => onDecrease(item)}>-1</button>
+          <span className="quantity-text"> {item.cantidad}</span>
+          <button className="cart-btn-qty" onClick={() => onIncrease(item)}>+1</button>
+        </div>
+
+        <button className="cart-btn-remove" onClick={() => onRemove(item.id)}>
+          Quitar
+        </button>
+      </div>
+    </article>
+  );
+});
 
 // --- COMPONENTE CONSUMIDOR: PÁGINA DEL CARRITO ---
 // Este componente muestra los productos agregados al carrito, permite modificar
@@ -95,43 +134,13 @@ function Cart() {
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         {/* Recorremos los items del carrito con .map */}
         {cartItems.map((item) => (
-          <article
+          <CartItem
             key={item.id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "16px",
-              border: "1px solid #eee",
-              borderRadius: "8px",
-              background: "#fff",
-            }}
-          >
-            <div>
-              <h3 style={{ margin: 0 }}>{item.nombre ?? "Sin nombre"}</h3>
-              {/* Le quitamos la palabra "Cantidad" de este texto */}
-              <p style={{ margin: "4px 0", color: "var(--color-text-muted)" }}>
-                Precio unitario: ${Number(item.precio ?? 0).toLocaleString("es-AR")}
-              </p>
-              <p style={{ margin: 0, fontWeight: "bold" }}>
-                Subtotal: ${Number(item.subtotal ?? 0).toLocaleString("es-AR")}
-              </p>
-            </div>
-
-            <div className="cart-quantity-controls">
-              {/* Nueva estructura de píldora para la cantidad */}
-              <div className="quantity-selector-pill">
-                <button className="cart-btn-qty" onClick={() => decreaseQuantity(item)}>-1</button>
-                <span className="quantity-text"> {item.cantidad}</span>
-                <button className="cart-btn-qty" onClick={() => increaseQuantity(item)}>+1</button>
-              </div>
-
-              {/* Botón quitar se mantiene afuera */}
-              <button className="cart-btn-remove" onClick={() => removeFromCart(item.id)}>
-                Quitar
-              </button>
-            </div>
-          </article>
+            item={item}
+            onDecrease={decreaseQuantity}
+            onIncrease={increaseQuantity}
+            onRemove={removeFromCart}
+          />
         ))}
       </div>
 
